@@ -93,20 +93,28 @@ export default function CustomerView() {
     setCheckoutStep('payment');
   };
 
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
   const handleSubmitPayment = async () => {
     if (!tempOrderId || !paymentProof) return;
-    const newOrder: any = {
-      tableId: tableId || '?',
-      items: cart,
-      total,
-      status: 'pending',
-      createdAt: Date.now(),
-      paymentProof: paymentProof
-    };
-    await addOrder(newOrder);
-    setCart([]);
-    setCheckoutStep('tracking');
-    setIsCartOpen(false);
+    setIsSubmittingOrder(true);
+    try {
+      const newOrder: any = {
+        tableId: tableId || '?',
+        items: cart,
+        total,
+        status: 'pending',
+        createdAt: Date.now(),
+        paymentProof: paymentProof
+      };
+      await addOrder(newOrder);
+      setCart([]);
+      setCheckoutStep('tracking');
+      setIsCartOpen(false);
+    } catch (err: any) {
+      alert('Gagal mengirim pesanan: ' + err.message);
+    } finally {
+      setIsSubmittingOrder(false);
+    }
   };
 
   const variants = {
@@ -408,19 +416,28 @@ export default function CustomerView() {
                 }} accept="image/*" style={{ display: 'none' }} />
                 
                 <button 
-                  disabled={!paymentProof}
+                  disabled={!paymentProof || isSubmittingOrder}
                   onClick={handleSubmitPayment}
                   style={{ 
                     marginTop: '2rem', 
                     width: '100%', 
-                    background: paymentProof ? 'var(--accent)' : 'var(--border)', 
+                    background: (paymentProof && !isSubmittingOrder) ? 'var(--accent)' : 'var(--border)', 
                     color: 'white', 
                     padding: '1.2rem', 
                     fontWeight: '800',
-                    fontSize: '1.1rem'
+                    fontSize: '1.1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.8rem'
                   }}
                 >
-                  Confirm Order
+                  {isSubmittingOrder ? (
+                    <>
+                      <Loader2 size={20} className="animate-spin" />
+                      Sending Order...
+                    </>
+                  ) : 'Confirm Order'}
                 </button>
               </div>
             </div>
