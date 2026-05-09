@@ -1,17 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useStore, OrderStatus, Order } from '../store/useStore';
-import { CheckCircle, Printer, AlertCircle, Clock, ArrowLeft, Eye } from 'lucide-react';
+import { CheckCircle, Printer, AlertCircle, Clock, ArrowLeft, Eye, BellRing, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function CashierView() {
   const { orders, updateOrderStatus } = useStore();
   const [printingOrder, setPrintingOrder] = useState<Order | null>(null);
+  const [newOrderPopup, setNewOrderPopup] = useState<Order | null>(null);
   
   const pendingOrders = orders.filter(o => o.status === 'pending');
   const activeOrders = orders.filter(o => o.status !== 'pending' && o.status !== 'completed');
+  
+  const prevPendingCount = useRef(pendingOrders.length);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    // Initialize audio
+    audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+  }, []);
+
+  useEffect(() => {
+    // Check if a new pending order has arrived
+    if (pendingOrders.length > prevPendingCount.current) {
+      const latestOrder = pendingOrders[pendingOrders.length - 1];
+      setNewOrderPopup(latestOrder);
+      
+      // Play sound
+      if (audioRef.current) {
+        audioRef.current.play().catch(e => console.log('Audio play blocked:', e));
+      }
+    }
+    prevPendingCount.current = pendingOrders.length;
+  }, [pendingOrders]);
 
   const handleVerify = (orderId: string) => {
     updateOrderStatus(orderId, 'verified');
+    if (newOrderPopup?.id === orderId) setNewOrderPopup(null);
   };
 
   const handlePrint = (order: Order) => {
@@ -223,9 +247,51 @@ export default function CashierView() {
         </div>
       )}
 
+      {/* New Order Alert Popup */}
+      {newOrderPopup && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(44, 24, 16, 0.6)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div className="animate-fade-in" style={{ background: 'white', padding: '2.5rem', borderRadius: 'var(--radius-lg)', width: '100%', maxWidth: '450px', position: 'relative', boxShadow: '0 40px 100px rgba(0,0,0,0.3)', border: '2px solid var(--accent)', textAlign: 'center' }}>
+            <div style={{ width: '80px', height: '80px', background: '#fff9e6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', border: '2px solid var(--accent)' }}>
+              <BellRing color="var(--accent)" size={40} className="animate-pulse" />
+            </div>
+            
+            <h2 style={{ fontSize: '2rem', color: 'var(--secondary)', marginBottom: '0.5rem' }}>Pesanan Baru!</h2>
+            <p style={{ color: 'var(--text-light)', fontSize: '1.1rem', marginBottom: '2rem' }}>Meja <strong style={{ color: 'var(--secondary)', fontSize: '1.4rem' }}>{newOrderPopup.tableId}</strong> baru saja memesan.</p>
+            
+            <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem', background: 'var(--bg)', border: '1px solid var(--border)' }}>
+               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.9rem', color: 'var(--text-light)', fontWeight: '600' }}>TOTAL TRANSAKSI</span>
+                  <span style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--secondary)' }}>Rp {newOrderPopup.total.toLocaleString()}</span>
+               </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button 
+                onClick={() => setNewOrderPopup(null)}
+                style={{ flex: 1, background: 'var(--bg)', color: 'var(--text-light)', padding: '1.2rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}
+              >
+                Nanti Saja
+              </button>
+              <button 
+                onClick={() => handleVerify(newOrderPopup.id)}
+                style={{ flex: 2, background: 'var(--accent)', color: 'white', padding: '1.2rem', borderRadius: 'var(--radius)', fontSize: '1.1rem', fontWeight: '800', boxShadow: '0 10px 20px rgba(212, 163, 115, 0.3)' }}
+              >
+                Lihat & Verifikasi
+              </button>
+            </div>
+
+            <button onClick={() => setNewOrderPopup(null)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', color: 'var(--text-light)', background: 'none' }}>
+              <X size={24} />
+            </button>
+          </div>
+        </div>
+      )}
+
       <style>{`
         .proof-img:hover { transform: scale(1.05); }
         .proof-overlay:hover { opacity: 1 !important; }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .7; transform: scale(1.1); } }
     @media print {
       .no-print { display: none !important; }
       .print-only { display: block !important; visibility: visible !important; }
