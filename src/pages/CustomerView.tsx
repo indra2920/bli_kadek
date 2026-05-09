@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { useStore, Order, OrderItem, MenuItem } from '../store/useStore';
 import { ShoppingCart, CheckCircle2, Loader2, X, Camera, ChevronLeft, ChevronRight, MessageSquare, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export default function CustomerView() {
   const { tableId } = useParams();
@@ -28,6 +30,17 @@ export default function CustomerView() {
   };
   
   const activeOrder = orders.filter(o => o.tableId === tableId).reverse()[0];
+
+  useEffect(() => {
+    // Direct listener for this tab to ensure data is always fresh
+    const unsubscribe = onSnapshot(collection(db, 'menu'), (snapshot) => {
+      const menuData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MenuItem));
+      // Update local store menu as well
+      useStore.setState({ menu: menuData });
+    });
+    
+    return () => unsubscribe();
+  }, []);
 
   const categories = useMemo(() => {
     return ['All', ...new Set(menu.map(item => item.category))];
