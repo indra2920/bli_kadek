@@ -139,7 +139,7 @@ export default function CustomerView() {
   };
 
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: '100px', overflowX: 'hidden', background: '#faf9f6', minHeight: '100vh' }}>
+    <div className="animate-fade-in" style={{ paddingBottom: '100px', overflowX: 'hidden', minHeight: '100vh' }}>
       {/* Header */}
       <div className="glass" style={{ 
         padding: '1.2rem 1.5rem', 
@@ -154,7 +154,7 @@ export default function CustomerView() {
         borderBottom: '1px solid var(--border)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <img src="/logo.png" alt="Logo" style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '2px solid white', boxShadow: 'var(--shadow-sm)' }} />
+          <img src="/logo.png" alt="Logo" style={{ width: '55px', height: '55px', borderRadius: '50%', objectFit: 'cover', border: '2px solid white', boxShadow: 'var(--shadow-sm)' }} />
           <div>
             <h1 className="brand" style={{ fontSize: '1.3rem', color: 'var(--secondary)', lineHeight: 1.1 }}>Hade Panjingan</h1>
             <p style={{ fontSize: '0.6rem', color: 'var(--primary)', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '1px' }}>Foodcourt & Homestay</p>

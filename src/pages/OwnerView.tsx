@@ -224,25 +224,6 @@ export default function OwnerView() {
                 Sync to Cloud
               </button>
               <button 
-                onClick={async () => {
-                  try {
-                    const testItems = [
-                      { name: 'Nasi Goreng Spesial', price: 25000, category: 'Main Course', description: 'Nasi goreng dengan telur dan ayam.', image: 'https://images.unsplash.com/photo-1512058560566-42724afbc2db?auto=format&fit=crop&q=80&w=300' },
-                      { name: 'Es Teh Manis', price: 5000, category: 'Drinks', description: 'Segar dan manis.', image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&q=80&w=300' }
-                    ];
-                    for(const item of testItems) {
-                      await addDoc(collection(db, 'menu'), item);
-                    }
-                    alert('DATA TEST BERHASIL DISUNTIKKAN! Cek layar pelanggan sekarang.');
-                  } catch (err: any) {
-                    alert('Suntik Data Gagal: ' + err.message);
-                  }
-                }}
-                style={{ padding: '0.6rem 1rem', background: '#e67e22', color: 'white', fontSize: '0.8rem' }}
-              >
-                Inject Test Data
-              </button>
-              <button 
                 onClick={() => handleOpenModal()}
                 style={{ padding: '0.6rem 1.2rem', background: 'var(--primary)', color: 'white', fontSize: '0.85rem', gap: '0.4rem' }}
               >
