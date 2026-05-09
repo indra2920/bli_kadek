@@ -6,6 +6,7 @@ import { useState, useRef } from 'react';
 export default function OwnerView() {
   const { orders, menu, addMenuItem, updateMenuItem, deleteMenuItem, qrisImage, setQrisImage, tables, addTable, deleteTable } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState<Partial<MenuItem>>({
@@ -45,7 +46,39 @@ export default function OwnerView() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData({ ...formData, image: reader.result as string });
+        const img = new Image();
+        img.src = reader.result as string;
+        img.onload = () => {
+          // Create canvas for compression
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          // Max dimensions
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Compress to JPEG with 0.7 quality
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          setFormData({ ...formData, image: compressedBase64 });
+        };
       };
       reader.readAsDataURL(file);
     }
@@ -53,22 +86,30 @@ export default function OwnerView() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
-    let finalImage = formData.image;
-    if (formData.image && formData.image.startsWith('data:image')) {
-      const tempId = Math.random().toString(36).substr(2, 9);
-      finalImage = await useStore.getState().uploadImage(`menu/${tempId}`, formData.image);
-    }
+    try {
+      let finalImage = formData.image;
+      if (formData.image && formData.image.startsWith('data:image')) {
+        const tempId = Math.random().toString(36).substr(2, 9);
+        finalImage = await useStore.getState().uploadImage(`menu/${tempId}`, formData.image);
+      }
 
-    if (editingItem) {
-      await updateMenuItem({ ...editingItem, ...formData, image: finalImage } as MenuItem);
-    } else {
-      await addMenuItem({
-        ...formData,
-        image: finalImage,
-      } as any);
+      if (editingItem) {
+        await updateMenuItem({ ...editingItem, ...formData, image: finalImage } as MenuItem);
+      } else {
+        await addMenuItem({
+          ...formData,
+          image: finalImage,
+        } as any);
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Error saving menu item:', error);
+      alert('Gagal menyimpan menu. Silakan coba lagi.');
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsModalOpen(false);
   };
 
   return (
@@ -358,8 +399,30 @@ export default function OwnerView() {
                 </div>
                 <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" style={{ display: 'none' }} />
               </div>
-              <button type="submit" style={{ width: '100%', padding: '1.1rem', background: 'var(--secondary)', color: 'white', fontSize: '1.1rem' }}>
-                {editingItem ? 'Save Changes' : 'Create Item'}
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                style={{ 
+                  width: '100%', 
+                  padding: '1.1rem', 
+                  background: isSubmitting ? 'var(--border)' : 'var(--secondary)', 
+                  color: 'white', 
+                  fontSize: '1.1rem',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.8rem'
+                }}
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin" style={{ width: '18px', height: '18px', border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%' }} />
+                    Menyimpan...
+                  </>
+                ) : (
+                  editingItem ? 'Save Changes' : 'Create Item'
+                )}
               </button>
             </form>
           </div>
