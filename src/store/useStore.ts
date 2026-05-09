@@ -152,11 +152,11 @@ export const useStore = create<AppState>((set, get) => {
 
     seedData: async () => {
       const initialMenu = [
-        { name: 'Nasi Goreng Bali', description: 'Authentic Balinese fried rice with sate lilit', price: 55000, category: 'Main Course', image: 'https://images.unsplash.com/photo-1601050638917-3f943569473b?auto=format&fit=crop&q=80&w=400' },
-        { name: 'Bebek Betutu', description: 'Slow-cooked duck with rich Balinese spices', price: 125000, category: 'Main Course', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=400' },
-        { name: 'Sate Lilit', description: 'Minced fish sate on lemongrass sticks', price: 45000, category: 'Appetizer', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=400' },
-        { name: 'Lawar Ayam', description: 'Traditional Balinese vegetable and chicken mix', price: 35000, category: 'Side Dish', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400' },
-        { name: 'Es Kelapa Muda', description: 'Fresh young coconut water', price: 25000, category: 'Drinks', image: 'https://images.unsplash.com/photo-1553177595-4de2bb0842b9?auto=format&fit=crop&q=80&w=400' },
+        { name: 'Nasi Goreng Spesial Hade', description: 'Nasi goreng bumbu rempah Bali dengan sate lilit dan telor mata sapi', price: 45000, category: 'Main Course', image: 'https://images.unsplash.com/photo-1512058560366-cd2427ff5961?auto=format&fit=crop&q=80&w=600' },
+        { name: 'Ayam Betutu Gilimanuk', description: 'Ayam kukus bumbu rempah khas Bali yang meresap sempurna', price: 85000, category: 'Main Course', image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&q=80&w=600' },
+        { name: 'Sate Lilit Ikan', description: 'Sate ikan cincang dengan parutan kelapa dan batang sereh', price: 35000, category: 'Appetizer', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=600' },
+        { name: 'Es Daluman', description: 'Minuman tradisional cincau hijau dengan santan dan gula aren', price: 15000, category: 'Drinks', image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&q=80&w=600' },
+        { name: 'Kopi Bali Boutique', description: 'Kopi hitam khas Bali dengan aroma yang kuat dan nikmat', price: 20000, category: 'Drinks', image: 'https://images.unsplash.com/photo-1541167760496-162955ed8a9f?auto=format&fit=crop&q=80&w=600' },
       ];
 
       for (const item of initialMenu) {
