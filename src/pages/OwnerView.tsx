@@ -84,32 +84,34 @@ export default function OwnerView() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     
-    try {
-      let finalImage = formData.image;
-      if (formData.image && formData.image.startsWith('data:image')) {
-        const tempId = Math.random().toString(36).substr(2, 9);
-        finalImage = await useStore.getState().uploadImage(`menu/${tempId}`, formData.image);
-      }
+    // Close modal immediately for "Instant" feel
+    setIsModalOpen(false);
 
-      if (editingItem) {
-        await updateMenuItem({ ...editingItem, ...formData, image: finalImage } as MenuItem);
-      } else {
-        await addMenuItem({
-          ...formData,
-          image: finalImage,
-        } as any);
+    // Run the heavy tasks in the background
+    (async () => {
+      try {
+        let finalImage = formData.image;
+        if (formData.image && formData.image.startsWith('data:image')) {
+          const tempId = Math.random().toString(36).substr(2, 9);
+          finalImage = await useStore.getState().uploadImage(`menu/${tempId}`, formData.image);
+        }
+
+        if (editingItem) {
+          await updateMenuItem({ ...editingItem, ...formData, image: finalImage } as MenuItem);
+        } else {
+          await addMenuItem({
+            ...formData,
+            image: finalImage,
+          } as any);
+        }
+      } catch (error) {
+        console.error('Background save failed:', error);
+        alert('Gagal menyimpan menu di latar belakang. Silakan cek koneksi Anda.');
       }
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error('Error saving menu item:', error);
-      alert('Gagal menyimpan menu. Silakan coba lagi.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    })();
   };
 
   return (
