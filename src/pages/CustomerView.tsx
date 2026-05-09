@@ -105,6 +105,7 @@ export default function CustomerView() {
           <img src="/logo.png" alt="Logo" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
           <div>
             <h1 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text)' }}>Hade Panjingan</h1>
+            <p style={{ fontSize: '0.65rem', color: 'var(--text-light)', fontWeight: '600', marginBottom: '1px' }}>Foodcourt & Homestay</p>
             <p style={{ fontSize: '0.7rem', color: 'var(--text-light)' }}>Table {tableId}</p>
           </div>
         </div>

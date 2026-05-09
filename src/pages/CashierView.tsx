@@ -38,7 +38,8 @@ export default function CashierView() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <img src="/logo.png" alt="Logo" style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }} />
               <div>
-                <h1 className="gradient-text" style={{ fontSize: '1.8rem', lineHeight: 1 }}>Hade Panjingan</h1>
+                <h1 className="gradient-text" style={{ fontSize: '1.6rem', lineHeight: 1 }}>Hade Panjingan</h1>
+                <p style={{ fontSize: '0.65rem', color: 'var(--text-light)', fontWeight: '700', textTransform: 'uppercase', marginTop: '0.2rem' }}>Foodcourt & Homestay</p>
                 <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', fontWeight: '700' }}>CASHIER DASHBOARD</p>
               </div>
             </div>

@@ -21,6 +21,7 @@ export default function LandingPage() {
         <div className="container">
           <img src="/logo.png" alt="Logo" style={{ width: '120px', height: '120px', borderRadius: '50%', marginBottom: '1.5rem', border: '3px solid white', objectFit: 'cover' }} />
           <h1 style={{ fontSize: '3.5rem', marginBottom: '0.5rem', lineHeight: 1.1 }}>Hade Panjingan</h1>
+          <p style={{ fontSize: '0.9rem', opacity: 0.8, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '0.3rem' }}>Foodcourt & Homestay</p>
           <p style={{ fontSize: '1.2rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto 2.5rem', fontWeight: 300 }}>
             Les Village - Bali
           </p>
