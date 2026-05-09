@@ -39,14 +39,6 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-            <div className="glass" style={{ padding: '1rem 2rem', borderRadius: '50px', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.8rem', color: 'var(--primary-dark)', border: '1px solid var(--border)' }}>
-              <Utensils size={20} /> Balinese Boutique Dining
-            </div>
-            <div className="glass" style={{ padding: '1rem 2rem', borderRadius: '50px', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.8rem', color: 'var(--primary-dark)', border: '1px solid var(--border)' }}>
-              <Coffee size={20} /> Artisan Coffee & Stay
-            </div>
-          </div>
         </div>
       </section>
 
