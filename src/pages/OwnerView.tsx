@@ -197,11 +197,20 @@ export default function OwnerView() {
             <div style={{ display: 'flex', gap: '0.8rem' }}>
               <button 
                 onClick={async () => {
-                  const items = menu;
-                  for(const item of items) {
-                    await updateMenuItem(item);
+                  try {
+                    const items = menu;
+                    if (items.length === 0) {
+                      alert('Tidak ada menu untuk disinkronkan. Tambahkan menu dulu!');
+                      return;
+                    }
+                    for(const item of items) {
+                      await updateMenuItem(item);
+                    }
+                    alert('Sinkronisasi Berhasil ke Proyek: bli-kadek-resto! ☁️');
+                  } catch (err: any) {
+                    console.error(err);
+                    alert('GAGAL SINKRON: ' + err.message);
                   }
-                  alert('Sinkronisasi Cloud Berhasil! ☁️');
                 }}
                 style={{ padding: '0.6rem 1rem', background: '#27ae60', color: 'white', fontSize: '0.8rem' }}
               >
@@ -453,6 +462,7 @@ export default function OwnerView() {
             </form>
           </div>
         </div>
+      )}
       {/* Diagnosis Panel */}
       <div style={{ fontSize: '0.6rem', color: '#ccc', textAlign: 'center', padding: '1rem', borderTop: '1px solid #eee', marginTop: '2rem' }}>
         DEBUG: Project[bli-kadek-resto] | MenuCount[{menu.length}] | DB[Firestore Default]

@@ -265,9 +265,6 @@ export default function CustomerView() {
       <div style={{ fontSize: '0.6rem', color: '#ccc', textAlign: 'center', padding: '1rem', borderTop: '1px solid #eee', marginTop: '2rem' }}>
         DEBUG: Project[bli-kadek-resto] | MenuCount[{menu.length}] | DB[Firestore Default]
       </div>
-    </div>
-  );
-}
 
       {/* Cart Modal */}
       <AnimatePresence>
@@ -485,6 +482,8 @@ export default function CustomerView() {
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
+        </div>
+      </div>
     </div>
   );
 }

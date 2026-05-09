@@ -133,7 +133,7 @@ export const useStore = create<AppState>((set, get) => {
 
     updateMenuItem: async (item) => {
       const { id, ...data } = item;
-      await updateDoc(doc(db, 'menu', id), data);
+      await setDoc(doc(db, 'menu', id), data, { merge: true });
     },
 
     deleteMenuItem: async (itemId) => {
