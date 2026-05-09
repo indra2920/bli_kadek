@@ -2,10 +2,14 @@ import { useStore, MenuItem } from '../store/useStore';
 import { BarChart3, TrendingUp, UtensilsCrossed, ArrowLeft, DollarSign, ShoppingBag, Plus, Edit2, Trash2, X, Upload } from 'lucide-react';
 import { compressImage } from '../utils/compression';
 import { Link } from 'react-router-dom';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export default function OwnerView() {
-  const { orders, menu, addMenuItem, updateMenuItem, deleteMenuItem, qrisImage, setQrisImage, tables, addTable, deleteTable } = useStore();
+  const { orders, menu, addMenuItem, updateMenuItem, deleteMenuItem, qrisImage, setQrisImage, tables, addTable, deleteTable, refreshData } = useStore();
+
+  useEffect(() => {
+    refreshData();
+  }, []);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
