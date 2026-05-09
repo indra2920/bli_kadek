@@ -1,5 +1,6 @@
 import { useStore, MenuItem } from '../store/useStore';
 import { BarChart3, TrendingUp, UtensilsCrossed, ArrowLeft, DollarSign, ShoppingBag, Plus, Edit2, Trash2, X, Upload } from 'lucide-react';
+import { compressImage } from '../utils/compression';
 import { Link } from 'react-router-dom';
 import { useState, useRef } from 'react';
 
@@ -215,6 +216,25 @@ export default function OwnerView() {
                 style={{ padding: '0.6rem 1rem', background: '#27ae60', color: 'white', fontSize: '0.8rem' }}
               >
                 Sync to Cloud
+              </button>
+              <button 
+                onClick={async () => {
+                  try {
+                    const testItems = [
+                      { name: 'Nasi Goreng Spesial', price: 25000, category: 'Main Course', description: 'Nasi goreng dengan telur dan ayam.', image: 'https://images.unsplash.com/photo-1512058560566-42724afbc2db?auto=format&fit=crop&q=80&w=300' },
+                      { name: 'Es Teh Manis', price: 5000, category: 'Drinks', description: 'Segar dan manis.', image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&q=80&w=300' }
+                    ];
+                    for(const item of testItems) {
+                      await addDoc(collection(db, 'menu'), item);
+                    }
+                    alert('DATA TEST BERHASIL DISUNTIKKAN! Cek layar pelanggan sekarang.');
+                  } catch (err: any) {
+                    alert('Suntik Data Gagal: ' + err.message);
+                  }
+                }}
+                style={{ padding: '0.6rem 1rem', background: '#e67e22', color: 'white', fontSize: '0.8rem' }}
+              >
+                Inject Test Data
               </button>
               <button 
                 onClick={() => handleOpenModal()}
@@ -463,10 +483,7 @@ export default function OwnerView() {
           </div>
         </div>
       )}
-      {/* Diagnosis Panel */}
-      <div style={{ fontSize: '0.6rem', color: '#ccc', textAlign: 'center', padding: '1rem', borderTop: '1px solid #eee', marginTop: '2rem' }}>
-        DEBUG: Project[bli-kadek-resto] | MenuCount[{menu.length}] | DB[Firestore Default]
-      </div>
+
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { ShoppingCart, CheckCircle2, Loader2, X, Camera, ChevronLeft, ChevronRig
 import { motion, AnimatePresence } from 'framer-motion';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
+import { compressImage } from '../utils/compression';
 
 export default function CustomerView() {
   const { tableId } = useParams();
@@ -32,7 +33,6 @@ export default function CustomerView() {
   const activeOrder = orders.filter(o => o.tableId === tableId).reverse()[0];
 
   useEffect(() => {
-    alert("KONEKSI AKTIF KE: " + (db as any)._databaseId?.projectId || "Unknown");
     console.log("Starting database listener for project: bli-kadek-resto");
     
     // Direct listener for this tab with error alerting
@@ -270,10 +270,7 @@ export default function CustomerView() {
               ))}
             </div>
           )}
-      {/* Diagnosis Panel */}
-      <div style={{ fontSize: '0.6rem', color: '#ccc', textAlign: 'center', padding: '1rem', borderTop: '1px solid #eee', marginTop: '2rem' }}>
-        DEBUG: Project[bli-kadek-resto] | MenuCount[{menu.length}] | DB[Firestore Default]
-      </div>
+
 
       {/* Cart Modal */}
       <AnimatePresence>
@@ -411,7 +408,11 @@ export default function CustomerView() {
                   const file = e.target.files?.[0];
                   if (file) {
                     const reader = new FileReader();
-                    reader.onloadend = () => setPaymentProof(reader.result as string);
+                    reader.onloadend = async () => {
+                      const base64 = reader.result as string;
+                      const compressed = await compressImage(base64);
+                      setPaymentProof(compressed);
+                    };
                     reader.readAsDataURL(file);
                   }
                 }} accept="image/*" style={{ display: 'none' }} />
