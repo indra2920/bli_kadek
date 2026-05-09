@@ -57,28 +57,38 @@ interface AppState {
   updateOrderProof: (orderId: string, proof: string) => Promise<void>;
   uploadImage: (path: string, base64: string) => Promise<string>;
   seedData: () => Promise<void>;
+  refreshData: () => Promise<void>;
 }
 
 export const useStore = create<AppState>((set, get) => {
-  // Initialize Real-time Listeners
-  onSnapshot(collection(db, 'menu'), (snapshot) => {
-    const menu = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MenuItem));
-    set({ menu });
-  });
+  // Initialize Real-time Listeners with Error Handling
+  const menuUnsubscribe = onSnapshot(collection(db, 'menu'), 
+    (snapshot) => {
+      const menu = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MenuItem));
+      set({ menu });
+    },
+    (error) => console.error('Menu Listener Error:', error)
+  );
 
-  onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), (snapshot) => {
-    const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
-    set({ orders });
-  });
+  const ordersUnsubscribe = onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), 
+    (snapshot) => {
+      const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
+      set({ orders });
+    },
+    (error) => console.error('Orders Listener Error:', error)
+  );
 
-  onSnapshot(collection(db, 'settings'), (snapshot) => {
-    const settings: any = {};
-    snapshot.docs.forEach(doc => {
-      settings[doc.id] = doc.data();
-    });
-    if (settings.tables) set({ tables: settings.tables.list });
-    if (settings.qris) set({ qrisImage: settings.qris.image });
-  });
+  const settingsUnsubscribe = onSnapshot(collection(db, 'settings'), 
+    (snapshot) => {
+      const settings: any = {};
+      snapshot.docs.forEach(doc => {
+        settings[doc.id] = doc.data();
+      });
+      if (settings.tables) set({ tables: settings.tables.list });
+      if (settings.qris) set({ qrisImage: settings.qris.image });
+    },
+    (error) => console.error('Settings Listener Error:', error)
+  );
 
   return {
     menu: [],
@@ -86,6 +96,17 @@ export const useStore = create<AppState>((set, get) => {
     tables: ['1', '2', '3', '4', '5'],
     qrisImage: '',
     isLoading: false,
+
+    // Backup Manual Fetch
+    refreshData: async () => {
+      try {
+        const menuSnap = await getDocs(collection(db, 'menu'));
+        const menu = menuSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as MenuItem));
+        set({ menu });
+      } catch (e) {
+        console.error('Manual Refresh Error:', e);
+      }
+    },
 
     addOrder: async (order) => {
       let finalProof = order.paymentProof;

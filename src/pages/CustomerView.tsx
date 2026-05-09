@@ -1,12 +1,12 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useStore, Order, OrderItem, MenuItem } from '../store/useStore';
-import { ShoppingCart, CheckCircle2, Loader2, X, Camera, ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
+import { ShoppingCart, CheckCircle2, Loader2, X, Camera, ChevronLeft, ChevronRight, MessageSquare, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CustomerView() {
   const { tableId } = useParams();
-  const { menu, addOrder, orders, qrisImage } = useStore();
+  const { menu, addOrder, orders, qrisImage, refreshData } = useStore();
   const [cart, setCart] = useState<OrderItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [catIndex, setCatIndex] = useState(0);
@@ -15,6 +15,17 @@ export default function CustomerView() {
   const [tempOrderId, setTempOrderId] = useState<string | null>(null);
   const [paymentProof, setPaymentProof] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    refreshData();
+  }, []);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refreshData();
+    setTimeout(() => setIsRefreshing(false), 1000);
+  };
   
   const activeOrder = orders.filter(o => o.tableId === tableId).reverse()[0];
 
@@ -162,10 +173,23 @@ export default function CustomerView() {
           {filteredMenu.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--text-light)' }}>
               <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🍃</div>
-              <p>Sedang memuat menu atau menu masih kosong...</p>
-              {menu.length === 0 && (
-                <p style={{ fontSize: '0.7rem', marginTop: '1rem' }}>Pastikan Owner sudah menambahkan menu di Dashboard.</p>
-              )}
+              <p style={{ marginBottom: '1.5rem' }}>Sedang memuat menu atau menu masih kosong...</p>
+              <button 
+                onClick={handleRefresh}
+                style={{ 
+                  background: 'var(--secondary)', 
+                  color: 'white', 
+                  padding: '0.8rem 1.5rem', 
+                  borderRadius: '30px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '0.6rem',
+                  margin: '0 auto'
+                }}
+              >
+                <RefreshCw size={18} className={isRefreshing ? "animate-spin" : ""} />
+                Cek Menu Sekarang
+              </button>
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '1.2rem', padding: '5px' }}>
