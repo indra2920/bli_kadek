@@ -109,18 +109,23 @@ export const useStore = create<AppState>((set, get) => {
     },
 
     addOrder: async (order) => {
-      let finalProof = order.paymentProof;
-      const tempId = Math.random().toString(36).substr(2, 9);
-      
-      if (order.paymentProof && order.paymentProof.startsWith('data:image')) {
-        finalProof = await get().uploadImage(`proofs/${tempId}`, order.paymentProof);
-      }
-
-      await addDoc(collection(db, 'orders'), {
+      // 1. SAVE IMMEDIATELY to Firestore for "Speed of Light" notification to Cashier
+      // We use the already compressed base64 from the UI
+      const orderRef = await addDoc(collection(db, 'orders'), {
         ...order,
-        paymentProof: finalProof,
+        status: 'pending',
         createdAt: Date.now()
       });
+
+      // 2. OPTIONAL: Upload to Storage in the background if we want to save space in Firestore later
+      // But for now, the compressed base64 is enough and much faster.
+      // If we really want to use Storage, we do it without 'await' so it doesn't block.
+      if (order.paymentProof && order.paymentProof.startsWith('data:image')) {
+        const tempId = orderRef.id;
+        get().uploadImage(`proofs/${tempId}`, order.paymentProof).then(url => {
+          updateDoc(doc(db, 'orders', tempId), { paymentProof: url });
+        }).catch(err => console.error('Background upload failed:', err));
+      }
     },
 
     updateOrderStatus: async (orderId, status) => {
