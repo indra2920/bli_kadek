@@ -194,12 +194,26 @@ export default function OwnerView() {
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.25rem' }}>
               <UtensilsCrossed size={20} color="var(--primary)" /> Menus
             </h2>
-            <button 
-              onClick={() => handleOpenModal()}
-              style={{ padding: '0.6rem 1.2rem', background: 'var(--primary)', color: 'white', fontSize: '0.85rem', gap: '0.4rem' }}
-            >
-              <Plus size={16} /> Add Item
-            </button>
+            <div style={{ display: 'flex', gap: '0.8rem' }}>
+              <button 
+                onClick={async () => {
+                  const items = menu;
+                  for(const item of items) {
+                    await updateMenuItem(item);
+                  }
+                  alert('Sinkronisasi Cloud Berhasil! ☁️');
+                }}
+                style={{ padding: '0.6rem 1rem', background: '#27ae60', color: 'white', fontSize: '0.8rem' }}
+              >
+                Sync to Cloud
+              </button>
+              <button 
+                onClick={() => handleOpenModal()}
+                style={{ padding: '0.6rem 1.2rem', background: 'var(--primary)', color: 'white', fontSize: '0.85rem', gap: '0.4rem' }}
+              >
+                <Plus size={16} /> Add Item
+              </button>
+            </div>
           </div>
           <div className="hide-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '400px', overflowY: 'auto' }}>
             {menu.length === 0 ? (
@@ -439,7 +453,10 @@ export default function OwnerView() {
             </form>
           </div>
         </div>
-      )}
+      {/* Diagnosis Panel */}
+      <div style={{ fontSize: '0.6rem', color: '#ccc', textAlign: 'center', padding: '1rem', borderTop: '1px solid #eee', marginTop: '2rem' }}>
+        DEBUG: Project[bli-kadek-resto] | MenuCount[{menu.length}] | DB[Firestore Default]
+      </div>
     </div>
   );
 }

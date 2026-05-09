@@ -261,11 +261,13 @@ export default function CustomerView() {
               ))}
             </div>
           )}
-          <div style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.6rem', color: '#ccc' }}>
-            System Check: {menu.length} items available
-          </div>
-        </div>
+      {/* Diagnosis Panel */}
+      <div style={{ fontSize: '0.6rem', color: '#ccc', textAlign: 'center', padding: '1rem', borderTop: '1px solid #eee', marginTop: '2rem' }}>
+        DEBUG: Project[bli-kadek-resto] | MenuCount[{menu.length}] | DB[Firestore Default]
       </div>
+    </div>
+  );
+}
 
       {/* Cart Modal */}
       <AnimatePresence>
