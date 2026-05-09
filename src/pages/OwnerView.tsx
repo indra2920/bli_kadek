@@ -1,7 +1,7 @@
 import { useStore, MenuItem } from '../store/useStore';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { BarChart3, TrendingUp, UtensilsCrossed, ArrowLeft, DollarSign, ShoppingBag, Plus, Edit2, Trash2, X, Upload } from 'lucide-react';
+import { BarChart3, TrendingUp, UtensilsCrossed, ArrowLeft, DollarSign, ShoppingBag, Plus, Edit2, Trash2, X, Upload, Activity } from 'lucide-react';
 import { compressImage } from '../utils/compression';
 import { Link } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
@@ -135,6 +135,9 @@ export default function OwnerView() {
               <h1 className="brand" style={{ fontSize: '1.8rem', color: 'var(--secondary)', lineHeight: 1 }}>Hade Panjingan</h1>
               <p style={{ fontSize: '0.65rem', color: 'var(--primary)', fontWeight: '800', letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: '0.2rem' }}>Foodcourt & Homestay</p>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '700', marginTop: '2px' }}>OWNER DASHBOARD</p>
+              <Link to="/debug" style={{ fontSize: '0.65rem', color: 'var(--primary)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', textDecoration: 'none' }}>
+                <Activity size={10} /> CEK KONEKSI SERVER
+              </Link>
             </div>
           </div>
         </div>
