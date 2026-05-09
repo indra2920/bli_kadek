@@ -32,6 +32,7 @@ export default function CustomerView() {
   const activeOrder = orders.filter(o => o.tableId === tableId).reverse()[0];
 
   useEffect(() => {
+    alert("KONEKSI AKTIF KE: " + (db as any)._databaseId?.projectId || "Unknown");
     console.log("Starting database listener for project: bli-kadek-resto");
     
     // Direct listener for this tab with error alerting
