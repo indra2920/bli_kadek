@@ -32,12 +32,20 @@ export default function CustomerView() {
   const activeOrder = orders.filter(o => o.tableId === tableId).reverse()[0];
 
   useEffect(() => {
-    // Direct listener for this tab to ensure data is always fresh
-    const unsubscribe = onSnapshot(collection(db, 'menu'), (snapshot) => {
-      const menuData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MenuItem));
-      // Update local store menu as well
-      useStore.setState({ menu: menuData });
-    });
+    console.log("Starting database listener for project: bli-kadek-resto");
+    
+    // Direct listener for this tab with error alerting
+    const unsubscribe = onSnapshot(collection(db, 'menu'), 
+      (snapshot) => {
+        const menuData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MenuItem));
+        console.log("Received menu data, count:", menuData.length);
+        useStore.setState({ menu: menuData });
+      },
+      (error) => {
+        console.error('DATABASE ERROR:', error);
+        alert('MASALAH KONEKSI DATABASE: ' + error.message + '\n\nPastikan Security Rules di Firebase Console diatur ke "allow read, write: if true;"');
+      }
+    );
     
     return () => unsubscribe();
   }, []);
