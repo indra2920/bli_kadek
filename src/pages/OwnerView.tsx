@@ -1,4 +1,6 @@
 import { useStore, MenuItem } from '../store/useStore';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import { BarChart3, TrendingUp, UtensilsCrossed, ArrowLeft, DollarSign, ShoppingBag, Plus, Edit2, Trash2, X, Upload } from 'lucide-react';
 import { compressImage } from '../utils/compression';
 import { Link } from 'react-router-dom';
