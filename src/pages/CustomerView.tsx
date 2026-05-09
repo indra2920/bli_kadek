@@ -158,66 +158,67 @@ export default function CustomerView() {
           </button>
         </div>
 
-        <div style={{ position: 'relative', minHeight: '60vh' }}>
-          <AnimatePresence initial={false} custom={direction}>
-            <motion.div
-              key={catIndex}
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{
-                rotateY: { duration: 0.6, ease: [0.645, 0.045, 0.355, 1] }
-              }}
-              style={{
-                width: '100%',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                transformOrigin: direction > 0 ? 'left center' : 'right center'
-              }}
-            >
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: '2rem', padding: '10px' }}>
-                {filteredMenu.map(item => (
-                  <div key={item.id} className="card-hover" style={{ 
-                    overflow: 'hidden', 
-                    background: 'white', 
-                    borderRadius: '24px', 
-                    boxShadow: 'var(--shadow-sm)',
-                    border: '1px solid var(--border)',
-                    position: 'relative'
-                  }}>
-                    <div style={{ position: 'relative', height: '180px', overflow: 'hidden' }}>
-                      <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} />
-                      <div style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(255,255,255,0.9)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary-dark)' }}>
-                        Rp {(item.price/1000).toFixed(0)}k
-                      </div>
-                    </div>
-                    <div style={{ padding: '1.2rem' }}>
-                      <h3 style={{ fontSize: '1rem', marginBottom: '0.4rem', color: 'var(--secondary)' }}>{item.name}</h3>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', height: '2.3rem', overflow: 'hidden', marginBottom: '1.2rem', lineHeight: 1.4 }}>{item.description}</p>
-                      <button 
-                        onClick={() => addToCart(item)}
-                        style={{ 
-                          width: '100%', 
-                          background: 'var(--bg)', 
-                          color: 'var(--primary-dark)', 
-                          padding: '0.7rem', 
-                          borderRadius: '16px', 
-                          fontSize: '0.85rem',
-                          border: '1px solid var(--border)',
-                          gap: '0.5rem'
-                        }}
-                      >
-                        + Add to Order
-                      </button>
+        <div style={{ minHeight: '60vh' }}>
+          {filteredMenu.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--text-light)' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🍃</div>
+              <p>Sedang memuat menu atau menu masih kosong...</p>
+              {menu.length === 0 && (
+                <p style={{ fontSize: '0.7rem', marginTop: '1rem' }}>Pastikan Owner sudah menambahkan menu di Dashboard.</p>
+              )}
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '1.2rem', padding: '5px' }}>
+              {filteredMenu.map(item => (
+                <div key={item.id} className="card-hover" style={{ 
+                  overflow: 'hidden', 
+                  background: 'white', 
+                  borderRadius: '24px', 
+                  boxShadow: 'var(--shadow-sm)',
+                  border: '1px solid var(--border)',
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}>
+                  <div style={{ position: 'relative', height: '150px', overflow: 'hidden' }}>
+                    <img 
+                      src={item.image} 
+                      alt={item.name} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=300';
+                      }}
+                    />
+                    <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'var(--secondary)', color: 'white', padding: '4px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '800' }}>
+                      Rp {(item.price/1000).toFixed(0)}k
                     </div>
                   </div>
-                ))}
-              </div>
-            </motion.div>
-          </AnimatePresence>
+                  <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <h3 style={{ fontSize: '0.9rem', marginBottom: '0.3rem', color: 'var(--secondary)', fontWeight: '700' }}>{item.name}</h3>
+                    <p style={{ fontSize: '0.65rem', color: 'var(--text-light)', height: '1.8rem', overflow: 'hidden', marginBottom: '1rem', lineHeight: 1.3 }}>{item.description}</p>
+                    <button 
+                      onClick={() => addToCart(item)}
+                      style={{ 
+                        marginTop: 'auto',
+                        width: '100%', 
+                        background: 'var(--bg)', 
+                        color: 'var(--primary-dark)', 
+                        padding: '0.5rem', 
+                        borderRadius: '12px', 
+                        fontSize: '0.75rem',
+                        border: '1px solid var(--border)',
+                        fontWeight: '700'
+                      }}
+                    >
+                      + Tambah
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          <div style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.6rem', color: '#ccc' }}>
+            System Check: {menu.length} items available
+          </div>
         </div>
       </div>
 
