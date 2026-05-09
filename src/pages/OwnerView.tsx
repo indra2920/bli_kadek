@@ -88,20 +88,12 @@ export default function OwnerView() {
     setIsSubmitting(true);
     
     try {
-      let finalImage = formData.image;
-      
-      // If image is a new base64 string, upload it
-      if (formData.image && formData.image.startsWith('data:image')) {
-        const tempId = Math.random().toString(36).substr(2, 9);
-        finalImage = await useStore.getState().uploadImage(`menu/${tempId}`, formData.image);
-      }
-
       const menuData = {
         name: formData.name,
         price: Number(formData.price),
         category: formData.category,
         description: formData.description,
-        image: finalImage
+        image: formData.image // Using the compressed base64 directly for instant saving
       };
 
       if (editingItem) {
@@ -110,12 +102,11 @@ export default function OwnerView() {
         await addMenuItem(menuData as any);
       }
       
-      alert('Berhasil menyimpan menu! ✨');
       setIsModalOpen(false);
       setEditingItem(null);
     } catch (error) {
       console.error('Save failed:', error);
-      alert('Gagal menyimpan menu. Pastikan koneksi internet stabil dan coba lagi.');
+      alert('Gagal menyimpan menu. Silakan coba lagi.');
     } finally {
       setIsSubmitting(false);
     }
