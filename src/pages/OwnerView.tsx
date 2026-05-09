@@ -44,43 +44,42 @@ export default function OwnerView() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const img = new Image();
-        img.src = reader.result as string;
-        img.onload = () => {
-          // Create canvas for compression
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-          
-          // Max dimensions
-          const MAX_WIDTH = 800;
-          const MAX_HEIGHT = 800;
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      img.onload = () => {
+        // Create canvas for compression
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        // Ultra-fast dimensions
+        const MAX_WIDTH = 600;
+        const MAX_HEIGHT = 600;
 
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
           }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
 
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
-          
-          // Compress to JPEG with 0.7 quality
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-          setFormData({ ...formData, image: compressedBase64 });
-        };
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // High compression (0.5) for instant upload
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
+        setFormData({ ...formData, image: compressedBase64 });
+        
+        // Clean up memory
+        URL.revokeObjectURL(img.src);
       };
-      reader.readAsDataURL(file);
     }
   };
 
