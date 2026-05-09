@@ -139,7 +139,7 @@ export default function CustomerView() {
   };
 
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: '100px', overflowX: 'hidden' }}>
+    <div className="animate-fade-in" style={{ paddingBottom: '100px', overflowX: 'hidden', background: '#faf9f6', minHeight: '100vh' }}>
       {/* Header */}
       <div className="glass" style={{ 
         padding: '1.2rem 1.5rem', 
