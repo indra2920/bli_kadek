@@ -85,30 +85,33 @@ export default function OwnerView() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     
-    try {
-      const menuData = {
-        name: formData.name,
-        price: Number(formData.price),
-        category: formData.category,
-        description: formData.description,
-        image: formData.image // Using the compressed base64 directly for instant saving
-      };
+    // Preparation
+    const menuData = {
+      name: formData.name,
+      price: Number(formData.price),
+      category: formData.category,
+      description: formData.description,
+      image: formData.image
+    };
 
-      if (editingItem) {
-        await updateMenuItem({ id: editingItem.id, ...menuData } as MenuItem);
+    const isEdit = !!editingItem;
+    const itemId = editingItem?.id;
+
+    // 1. CLOSE MODAL IMMEDIATELY for "Super Fast" feel
+    setIsModalOpen(false);
+    setEditingItem(null);
+
+    // 2. Perform the update in the background (Optimistic UI)
+    try {
+      if (isEdit && itemId) {
+        await updateMenuItem({ id: itemId, ...menuData } as MenuItem);
       } else {
         await addMenuItem(menuData as any);
       }
-      
-      setIsModalOpen(false);
-      setEditingItem(null);
     } catch (error) {
-      console.error('Save failed:', error);
-      alert('Gagal menyimpan menu. Silakan coba lagi.');
-    } finally {
-      setIsSubmitting(false);
+      console.error('Save failed in background:', error);
+      alert('Maaf, perubahan terakhir gagal disimpan. Silakan cek koneksi internet Anda.');
     }
   };
 
