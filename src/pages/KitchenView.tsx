@@ -23,7 +23,13 @@ export default function KitchenView() {
           <Link to="/" style={{ color: 'var(--text)', background: 'var(--surface)', padding: '0.6rem', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>
             <ArrowLeft size={20} />
           </Link>
-          <h1 className="gradient-text" style={{ fontSize: '2.2rem' }}>Kitchen Display</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <img src="/logo.png" alt="Logo" style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }} />
+            <div>
+              <h1 className="gradient-text" style={{ fontSize: '1.8rem', lineHeight: 1 }}>Hade Panjingan</h1>
+              <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', fontWeight: '700' }}>KITCHEN DISPLAY</p>
+            </div>
+          </div>
         </div>
         
         <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '0.5rem' }} className="hide-scrollbar">

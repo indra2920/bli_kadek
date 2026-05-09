@@ -100,10 +100,13 @@ export default function CustomerView() {
   return (
     <div className="animate-fade-in" style={{ paddingBottom: '100px', overflowX: 'hidden' }}>
       {/* Header */}
-      <div className="glass" style={{ padding: '1.2rem 1.5rem', position: 'sticky', top: 0, zIndex: 100, boxShadow: 'var(--shadow-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h1 className="brand gradient-text" style={{ fontSize: '1.6rem' }}>Bli Kadek</h1>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '600' }}>TABLE {tableId}</p>
+      <div className="glass" style={{ padding: '0.8rem 1.5rem', position: 'sticky', top: 0, zIndex: 100, boxShadow: 'var(--shadow-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+          <img src="/logo.png" alt="Logo" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+          <div>
+            <h1 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text)' }}>Hade Panjingan</h1>
+            <p style={{ fontSize: '0.7rem', color: 'var(--text-light)' }}>Table {tableId}</p>
+          </div>
         </div>
         <div style={{ display: 'flex', gap: '0.8rem' }}>
           {activeOrder && (

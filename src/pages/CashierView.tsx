@@ -30,11 +30,19 @@ export default function CashierView() {
   return (
     <div className="container animate-fade-in" style={{ padding: '2rem 0' }}>
       <header className="no-print" style={{ marginBottom: '3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <Link to="/" style={{ color: 'var(--text)', background: 'var(--surface)', padding: '0.6rem', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>
-            <ArrowLeft size={20} />
-          </Link>
-          <h1 className="gradient-text" style={{ fontSize: '2.2rem' }}>Cashier</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <Link to="/" style={{ color: 'var(--text)', background: 'var(--surface)', padding: '0.6rem', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>
+              <ArrowLeft size={20} />
+            </Link>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <img src="/logo.png" alt="Logo" style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }} />
+              <div>
+                <h1 className="gradient-text" style={{ fontSize: '1.8rem', lineHeight: 1 }}>Hade Panjingan</h1>
+                <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', fontWeight: '700' }}>CASHIER DASHBOARD</p>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
@@ -180,8 +188,8 @@ export default function CashierView() {
       {printingOrder && (
         <div className="print-only" style={{ padding: '20px', fontFamily: 'monospace' }}>
           <div style={{ textAlign: 'center', borderBottom: '1px dashed black', paddingBottom: '10px', marginBottom: '10px' }}>
-            <h1 style={{ fontSize: '24px', margin: '0' }}>BLI KADEK</h1>
-            <p style={{ fontSize: '14px', margin: '5px 0' }}>KITCHEN SLIP</p>
+            <h1 style={{ fontSize: '20px', margin: '0' }}>HADE PANJINGAN</h1>
+            <p style={{ fontSize: '12px', margin: '5px 0' }}>KITCHEN SLIP</p>
           </div>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>

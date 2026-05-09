@@ -19,16 +19,17 @@ export default function LandingPage() {
         boxShadow: 'var(--shadow)'
       }}>
         <div className="container">
-          <h1 style={{ fontSize: '3.5rem', marginBottom: '1rem', lineHeight: 1.1 }}>Bli Kadek</h1>
+          <img src="/logo.png" alt="Logo" style={{ width: '120px', height: '120px', borderRadius: '50%', marginBottom: '1.5rem', border: '3px solid white', objectFit: 'cover' }} />
+          <h1 style={{ fontSize: '3.5rem', marginBottom: '0.5rem', lineHeight: 1.1 }}>Hade Panjingan</h1>
           <p style={{ fontSize: '1.2rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto 2.5rem', fontWeight: 300 }}>
-            Authentic Balinese flavors meets modern dining experience.
+            Les Village - Bali
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
             <div className="glass" style={{ padding: '0.8rem 1.5rem', borderRadius: '40px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <Utensils size={18} /> Fine Dining
+              <Utensils size={18} /> Balinese Cuisine
             </div>
             <div className="glass" style={{ padding: '0.8rem 1.5rem', borderRadius: '40px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <TrendingUp size={18} /> QR Ordering
+              <TrendingUp size={18} /> Digital Ordering
             </div>
           </div>
         </div>
@@ -120,8 +121,9 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer style={{ marginTop: '8rem', textAlign: 'center', padding: '4rem 0', borderTop: '1px solid var(--border)' }}>
-        <p className="brand" style={{ fontSize: '1.5rem', color: 'var(--primary)', marginBottom: '0.5rem' }}>Bli Kadek</p>
-        <p style={{ color: 'var(--text-light)', fontSize: '0.85rem' }}>© 2026 Balinese Traditional Cuisine & Modern Dining</p>
+        <img src="/logo.png" alt="Logo" style={{ width: '60px', height: '60px', borderRadius: '50%', marginBottom: '1rem' }} />
+        <p className="brand" style={{ fontSize: '1.5rem', color: 'var(--primary)', marginBottom: '0.5rem' }}>Hade Panjingan</p>
+        <p style={{ color: 'var(--text-light)', fontSize: '0.85rem' }}>© 2026 Les Village - Bali</p>
       </footer>
     </div>
   );

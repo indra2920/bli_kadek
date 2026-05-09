@@ -78,9 +78,14 @@ export default function OwnerView() {
           <Link to="/" style={{ color: 'var(--text)', background: 'var(--surface)', padding: '0.6rem', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>
             <ArrowLeft size={20} />
           </Link>
-          <h1 className="gradient-text" style={{ fontSize: '2.2rem' }}>Dashboard</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <img src="/logo.png" alt="Logo" style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }} />
+            <div>
+              <h1 className="gradient-text" style={{ fontSize: '1.8rem', lineHeight: 1 }}>Hade Panjingan</h1>
+              <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', fontWeight: '700' }}>OWNER DASHBOARD</p>
+            </div>
+          </div>
         </div>
-        <p style={{ color: 'var(--text-light)', fontSize: '0.95rem' }}>Management & Business Insights</p>
       </header>
 
       {/* Analytics Overview */}
