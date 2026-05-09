@@ -100,23 +100,37 @@ export default function CustomerView() {
   return (
     <div className="animate-fade-in" style={{ paddingBottom: '100px', overflowX: 'hidden' }}>
       {/* Header */}
-      <div className="glass" style={{ padding: '0.8rem 1.5rem', position: 'sticky', top: 0, zIndex: 100, boxShadow: 'var(--shadow-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-          <img src="/logo.png" alt="Logo" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+      <div className="glass" style={{ 
+        padding: '1.2rem 1.5rem', 
+        position: 'sticky', 
+        top: 0, 
+        zIndex: 100, 
+        boxShadow: 'var(--shadow)', 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        background: 'rgba(253, 250, 245, 0.9)',
+        borderBottom: '1px solid var(--border)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <img src="/logo.png" alt="Logo" style={{ width: '55px', height: '55px', borderRadius: '50%', objectFit: 'cover', border: '2px solid white', boxShadow: 'var(--shadow-sm)' }} />
           <div>
-            <h1 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text)' }}>Hade Panjingan</h1>
-            <p style={{ fontSize: '0.65rem', color: 'var(--text-light)', fontWeight: '600', marginBottom: '1px' }}>Foodcourt & Homestay</p>
-            <p style={{ fontSize: '0.7rem', color: 'var(--text-light)' }}>Table {tableId}</p>
+            <h1 className="brand" style={{ fontSize: '1.3rem', color: 'var(--secondary)', lineHeight: 1.1 }}>Hade Panjingan</h1>
+            <p style={{ fontSize: '0.6rem', color: 'var(--primary)', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '1px' }}>Foodcourt & Homestay</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-light)', fontSize: '0.75rem' }}>
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#27ae60' }} />
+              Table {tableId}
+            </div>
           </div>
         </div>
         <div style={{ display: 'flex', gap: '0.8rem' }}>
           {activeOrder && (
-            <button onClick={() => setCheckoutStep('tracking')} style={{ background: 'var(--bg)', border: '1px solid var(--border)', padding: '0.5rem 1rem', borderRadius: '40px' }}>
-              <Loader2 size={16} className={activeOrder.status !== 'completed' ? "animate-spin" : ""} />
+            <button onClick={() => setCheckoutStep('tracking')} style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '0.6rem 1.1rem', borderRadius: '40px', color: 'var(--primary-dark)' }}>
+              <Loader2 size={18} className={activeOrder.status !== 'completed' ? "animate-spin" : ""} />
             </button>
           )}
-          <button onClick={() => setIsCartOpen(true)} style={{ background: 'var(--secondary)', color: 'white', padding: '0.6rem 1.2rem', borderRadius: '40px', gap: '0.6rem' }}>
-            <ShoppingCart size={18} /> <span>{cart.length}</span>
+          <button onClick={() => setIsCartOpen(true)} style={{ background: 'var(--secondary)', color: 'white', padding: '0.8rem 1.4rem', borderRadius: '40px', gap: '0.8rem', boxShadow: 'var(--shadow-sm)' }}>
+            <ShoppingCart size={20} /> <span style={{ fontWeight: '800' }}>{cart.length}</span>
           </button>
         </div>
       </div>
@@ -164,22 +178,40 @@ export default function CustomerView() {
                 transformOrigin: direction > 0 ? 'left center' : 'right center'
               }}
             >
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(165px, 1fr))', gap: '1.5rem', padding: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: '2rem', padding: '10px' }}>
                 {filteredMenu.map(item => (
-                  <div key={item.id} className="card" style={{ overflow: 'hidden', background: 'white' }}>
-                    <img src={item.image} alt={item.name} style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
-                    <div style={{ padding: '1rem' }}>
-                      <h3 style={{ fontSize: '1rem', marginBottom: '0.4rem' }}>{item.name}</h3>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', height: '2.3rem', overflow: 'hidden', marginBottom: '1rem' }}>{item.description}</p>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: '800', color: 'var(--primary)' }}>Rp {(item.price/1000).toFixed(0)}k</span>
-                        <button 
-                          onClick={() => addToCart(item)}
-                          style={{ background: 'var(--secondary)', color: 'white', width: '32px', height: '32px', borderRadius: '50%' }}
-                        >
-                          +
-                        </button>
+                  <div key={item.id} className="card-hover" style={{ 
+                    overflow: 'hidden', 
+                    background: 'white', 
+                    borderRadius: '24px', 
+                    boxShadow: 'var(--shadow-sm)',
+                    border: '1px solid var(--border)',
+                    position: 'relative'
+                  }}>
+                    <div style={{ position: 'relative', height: '180px', overflow: 'hidden' }}>
+                      <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} />
+                      <div style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(255,255,255,0.9)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary-dark)' }}>
+                        Rp {(item.price/1000).toFixed(0)}k
                       </div>
+                    </div>
+                    <div style={{ padding: '1.2rem' }}>
+                      <h3 style={{ fontSize: '1rem', marginBottom: '0.4rem', color: 'var(--secondary)' }}>{item.name}</h3>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', height: '2.3rem', overflow: 'hidden', marginBottom: '1.2rem', lineHeight: 1.4 }}>{item.description}</p>
+                      <button 
+                        onClick={() => addToCart(item)}
+                        style={{ 
+                          width: '100%', 
+                          background: 'var(--bg)', 
+                          color: 'var(--primary-dark)', 
+                          padding: '0.7rem', 
+                          borderRadius: '16px', 
+                          fontSize: '0.85rem',
+                          border: '1px solid var(--border)',
+                          gap: '0.5rem'
+                        }}
+                      >
+                        + Add to Order
+                      </button>
                     </div>
                   </div>
                 ))}

@@ -73,17 +73,17 @@ export default function OwnerView() {
 
   return (
     <div className="container animate-fade-in" style={{ padding: '2rem 0' }}>
-      <header style={{ marginBottom: '2.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <Link to="/" style={{ color: 'var(--text)', background: 'var(--surface)', padding: '0.6rem', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>
-            <ArrowLeft size={20} />
+      <header style={{ marginBottom: '3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+          <Link to="/" style={{ color: 'var(--secondary)', background: 'var(--surface)', padding: '0.8rem', borderRadius: '50%', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)' }}>
+            <ArrowLeft size={22} />
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <img src="/logo.png" alt="Logo" style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+            <img src="/logo.png" alt="Logo" style={{ width: '65px', height: '65px', borderRadius: '50%', objectFit: 'cover', border: '2px solid white', boxShadow: 'var(--shadow-sm)' }} />
             <div>
-              <h1 className="gradient-text" style={{ fontSize: '1.6rem', lineHeight: 1 }}>Hade Panjingan</h1>
-              <p style={{ fontSize: '0.65rem', color: 'var(--text-light)', fontWeight: '700', textTransform: 'uppercase', marginTop: '0.2rem' }}>Foodcourt & Homestay</p>
-              <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', fontWeight: '700' }}>OWNER DASHBOARD</p>
+              <h1 className="brand" style={{ fontSize: '1.8rem', color: 'var(--secondary)', lineHeight: 1 }}>Hade Panjingan</h1>
+              <p style={{ fontSize: '0.65rem', color: 'var(--primary)', fontWeight: '800', letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: '0.2rem' }}>Foodcourt & Homestay</p>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '700', marginTop: '2px' }}>OWNER DASHBOARD</p>
             </div>
           </div>
         </div>

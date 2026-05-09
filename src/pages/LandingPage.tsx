@@ -1,6 +1,6 @@
 import { QRCodeSVG } from 'qrcode.react';
 import { Link } from 'react-router-dom';
-import { LayoutGrid, Utensils, ChefHat, TrendingUp, ChevronRight } from 'lucide-react';
+import { LayoutGrid, Utensils, ChefHat, TrendingUp, ChevronRight, MapPin, Coffee } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
 export default function LandingPage() {
@@ -10,109 +10,152 @@ export default function LandingPage() {
     <div className="animate-fade-in" style={{ paddingBottom: '5rem' }}>
       {/* Hero Section */}
       <section style={{ 
-        background: 'linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%)', 
-        padding: '6rem 1rem', 
+        background: 'linear-gradient(180deg, #e8dfd8 0%, var(--bg) 100%)', 
+        padding: '8rem 1rem 6rem', 
         textAlign: 'center',
-        color: 'white',
-        borderRadius: '0 0 60px 60px',
-        marginBottom: '4rem',
-        boxShadow: 'var(--shadow)'
+        borderRadius: '0 0 80px 80px',
+        marginBottom: '5rem',
+        borderBottom: '1px solid var(--border)',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <div className="container">
-          <img src="/logo.png" alt="Logo" style={{ width: '120px', height: '120px', borderRadius: '50%', marginBottom: '1.5rem', border: '3px solid white', objectFit: 'cover' }} />
-          <h1 style={{ fontSize: '3.5rem', marginBottom: '0.5rem', lineHeight: 1.1 }}>Hade Panjingan</h1>
-          <p style={{ fontSize: '0.9rem', opacity: 0.8, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '0.3rem' }}>Foodcourt & Homestay</p>
-          <p style={{ fontSize: '1.2rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto 2.5rem', fontWeight: 300 }}>
-            Les Village - Bali
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-            <div className="glass" style={{ padding: '0.8rem 1.5rem', borderRadius: '40px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <Utensils size={18} /> Balinese Cuisine
+        {/* Decorative elements */}
+        <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '300px', height: '300px', borderRadius: '50%', background: 'rgba(212, 163, 115, 0.1)', filter: 'blur(60px)' }} />
+        <div style={{ position: 'absolute', bottom: '0', left: '10%', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(141, 110, 99, 0.05)', filter: 'blur(40px)' }} />
+
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ marginBottom: '2rem', display: 'inline-block', position: 'relative' }}>
+             <div style={{ position: 'absolute', inset: '-15px', border: '1px solid var(--accent)', borderRadius: '50%', opacity: 0.3 }} />
+             <img src="/logo.png" alt="Logo" style={{ width: '180px', height: '180px', borderRadius: '50%', border: '4px solid white', boxShadow: 'var(--shadow)', objectFit: 'cover' }} />
+          </div>
+          
+          <h1 style={{ fontSize: '4rem', marginBottom: '0.8rem', color: 'var(--secondary)', letterSpacing: '-0.03em' }}>Hade Panjingan</h1>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', marginBottom: '3rem' }}>
+            <p style={{ fontSize: '1rem', color: 'var(--primary)', fontWeight: '700', letterSpacing: '0.3em', textTransform: 'uppercase' }}>Foodcourt & Homestay</p>
+            <div style={{ width: '40px', height: '2px', background: 'var(--accent)', margin: '0.5rem 0' }} />
+            <p style={{ fontSize: '1.2rem', color: 'var(--text-light)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <MapPin size={18} /> Les Village - Bali
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+            <div className="glass" style={{ padding: '1rem 2rem', borderRadius: '50px', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.8rem', color: 'var(--primary-dark)', border: '1px solid var(--border)' }}>
+              <Utensils size={20} /> Balinese Boutique Dining
             </div>
-            <div className="glass" style={{ padding: '0.8rem 1.5rem', borderRadius: '40px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <TrendingUp size={18} /> Digital Ordering
+            <div className="glass" style={{ padding: '1rem 2rem', borderRadius: '50px', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.8rem', color: 'var(--primary-dark)', border: '1px solid var(--border)' }}>
+              <Coffee size={20} /> Artisan Coffee & Stay
             </div>
           </div>
         </div>
       </section>
 
       <div className="container">
-        {/* Management Links */}
+        {/* Management Access */}
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h2 style={{ fontSize: '1.8rem', color: 'var(--secondary)', marginBottom: '0.5rem' }}>Management Dashboards</h2>
+          <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>Access internal systems for staff and owners</p>
+        </div>
+
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-          gap: '1.5rem', 
-          marginBottom: '5rem' 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+          gap: '2rem', 
+          marginBottom: '6rem' 
         }}>
-          <Link to="/cashier" className="card card-hover" style={{ padding: '2rem', textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link to="/cashier" className="card card-hover" style={{ padding: '2.5rem', textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid var(--border)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <div style={{ background: '#fff9e6', padding: '1rem', borderRadius: '16px' }}>
-                <LayoutGrid color="#f39c12" size={28} />
+              <div style={{ background: '#fdf3e7', padding: '1.2rem', borderRadius: '20px' }}>
+                <LayoutGrid color="#d4a373" size={32} />
               </div>
               <div>
-                <h3 style={{ fontSize: '1.2rem' }}>Cashier</h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>Verify & Payments</p>
+                <h3 style={{ fontSize: '1.3rem', marginBottom: '0.2rem' }}>Cashier</h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>Order verification & Payments</p>
               </div>
             </div>
-            <ChevronRight size={20} color="var(--border)" />
+            <ChevronRight size={24} color="var(--border)" />
           </Link>
 
-          <Link to="/kitchen" className="card card-hover" style={{ padding: '2rem', textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link to="/kitchen" className="card card-hover" style={{ padding: '2.5rem', textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid var(--border)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <div style={{ background: '#eafaf1', padding: '1rem', borderRadius: '16px' }}>
-                <ChefHat color="#27ae60" size={28} />
+              <div style={{ background: '#f2f9f5', padding: '1.2rem', borderRadius: '20px' }}>
+                <ChefHat color="#27ae60" size={32} />
               </div>
               <div>
-                <h3 style={{ fontSize: '1.2rem' }}>Kitchen</h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>Order Preparation</p>
+                <h3 style={{ fontSize: '1.3rem', marginBottom: '0.2rem' }}>Kitchen</h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>Live order preparation display</p>
               </div>
             </div>
-            <ChevronRight size={20} color="var(--border)" />
+            <ChevronRight size={24} color="var(--border)" />
           </Link>
 
-          <Link to="/owner" className="card card-hover" style={{ padding: '2rem', textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link to="/owner" className="card card-hover" style={{ padding: '2.5rem', textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid var(--border)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <div style={{ background: '#ebf5fb', padding: '1rem', borderRadius: '16px' }}>
-                <TrendingUp color="#3498db" size={28} />
+              <div style={{ background: '#f0f7ff', padding: '1.2rem', borderRadius: '20px' }}>
+                <TrendingUp color="#3498db" size={32} />
               </div>
               <div>
-                <h3 style={{ fontSize: '1.2rem' }}>Owner</h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>Analytics & Menu</p>
+                <h3 style={{ fontSize: '1.3rem', marginBottom: '0.2rem' }}>Owner</h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>Analytics & Business Insights</p>
               </div>
             </div>
-            <ChevronRight size={20} color="var(--border)" />
+            <ChevronRight size={24} color="var(--border)" />
           </Link>
         </div>
 
         {/* QR Section */}
-        <section style={{ textAlign: 'center' }}>
-          <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Table QR Codes</h2>
-          <p style={{ color: 'var(--text-light)', marginBottom: '3rem' }}>Scan to start ordering from your table</p>
+        <section style={{ 
+          background: 'var(--surface)', 
+          padding: '5rem 2rem', 
+          borderRadius: 'var(--radius-lg)', 
+          boxShadow: 'var(--shadow)',
+          textAlign: 'center',
+          border: '1px solid var(--border)'
+        }}>
+          <h2 style={{ fontSize: '2.5rem', color: 'var(--secondary)', marginBottom: '1rem' }}>Table QR Codes</h2>
+          <p style={{ color: 'var(--text-light)', marginBottom: '4rem', fontSize: '1.1rem' }}>Generate and scan to start the dining experience</p>
           
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', 
-            gap: '2rem' 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
+            gap: '2.5rem' 
           }}>
             {tables.map(id => (
-              <div key={id} className="card card-hover" style={{ padding: '2rem', textAlign: 'center' }}>
-                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border)', marginBottom: '1.5rem', display: 'inline-block' }}>
-                  <QRCodeSVG value={`${window.location.origin}/table/${id}`} size={140} />
+              <div key={id} className="card-hover" style={{ 
+                padding: '2.5rem', 
+                textAlign: 'center', 
+                background: 'white', 
+                borderRadius: 'var(--radius)',
+                border: '1px solid var(--border)'
+              }}>
+                <div style={{ 
+                  background: 'var(--bg)', 
+                  padding: '2rem', 
+                  borderRadius: '24px', 
+                  border: '1px solid var(--border)', 
+                  marginBottom: '1.5rem', 
+                  display: 'inline-block',
+                  boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
+                }}>
+                  <QRCodeSVG value={`${window.location.origin}/table/${id}`} size={160} fgColor="var(--secondary)" />
                 </div>
-                <h3 style={{ fontSize: '1.3rem', marginBottom: '0.5rem' }}>Table {id}</h3>
+                <h3 style={{ fontSize: '1.5rem', marginBottom: '0.8rem', color: 'var(--secondary)' }}>Table {id}</h3>
                 <Link 
                   to={`/table/${id}`} 
                   style={{ 
-                    fontSize: '0.85rem', 
+                    fontSize: '1rem', 
                     color: 'var(--primary)', 
                     textDecoration: 'none', 
                     fontWeight: '700',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.4rem'
+                    gap: '0.5rem',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '30px',
+                    background: 'var(--bg)'
                   }}
                 >
-                  Open Menu <ChevronRight size={14} />
+                  View Digital Menu <ChevronRight size={18} />
                 </Link>
               </div>
             ))}
@@ -121,10 +164,14 @@ export default function LandingPage() {
       </div>
 
       {/* Footer */}
-      <footer style={{ marginTop: '8rem', textAlign: 'center', padding: '4rem 0', borderTop: '1px solid var(--border)' }}>
-        <img src="/logo.png" alt="Logo" style={{ width: '60px', height: '60px', borderRadius: '50%', marginBottom: '1rem' }} />
-        <p className="brand" style={{ fontSize: '1.5rem', color: 'var(--primary)', marginBottom: '0.5rem' }}>Hade Panjingan</p>
-        <p style={{ color: 'var(--text-light)', fontSize: '0.85rem' }}>© 2026 Les Village - Bali</p>
+      <footer style={{ marginTop: '10rem', textAlign: 'center', padding: '6rem 0', borderTop: '1px solid var(--border)', background: 'white' }}>
+        <img src="/logo.png" alt="Logo" style={{ width: '80px', height: '80px', borderRadius: '50%', marginBottom: '1.5rem', opacity: 0.9 }} />
+        <p className="brand" style={{ fontSize: '2rem', color: 'var(--secondary)', marginBottom: '0.5rem' }}>Hade Panjingan</p>
+        <p style={{ color: 'var(--primary)', fontWeight: '600', letterSpacing: '0.1em', marginBottom: '1rem' }}>FOODCOURT & HOMESTAY</p>
+        <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>Les Village - Bali</p>
+        <div style={{ marginTop: '3rem', fontSize: '0.8rem', color: 'var(--text-light)', opacity: 0.6 }}>
+          © 2026 Hade Panjingan Bali. All rights reserved.
+        </div>
       </footer>
     </div>
   );

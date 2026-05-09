@@ -1,22 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap');
 
 :root {
-  --primary: #c19a6b;
-  --primary-light: #e0c9a6;
-  --primary-dark: #a67c52;
-  --secondary: #1a1a1a;
-  --accent: #4a5d23;
-  --bg: #f9f7f2;
+  --primary: #8d6e63; /* Warm Brown */
+  --primary-light: #bcaaa4;
+  --primary-dark: #5d4037;
+  --secondary: #2c1810; /* Darker Espresso */
+  --accent: #d4a373; /* Golden Sand */
+  --bg: #fdfaf5; /* Creamy White */
   --surface: #ffffff;
-  --surface-glass: rgba(255, 255, 255, 0.8);
-  --text: #2d3436;
-  --text-light: #636e72;
-  --border: #e8e4db;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  --radius-sm: 8px;
-  --radius: 16px;
-  --radius-lg: 24px;
+  --surface-glass: rgba(255, 255, 255, 0.7);
+  --text: #2c1810;
+  --text-light: #8b736a;
+  --border: #e8dfd8;
+  --shadow-sm: 0 5px 15px rgba(44, 24, 16, 0.05);
+  --shadow: 0 20px 40px rgba(44, 24, 16, 0.08);
+  --radius-sm: 12px;
+  --radius: 24px;
+  --radius-lg: 32px;
 }
 
 * {
