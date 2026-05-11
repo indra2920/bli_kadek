@@ -61,77 +61,112 @@ interface AppState {
 }
 
 export const useStore = create<AppState>((set, get) => {
-  // Initialize Real-time Listeners with Error Handling
-  const menuUnsubscribe = onSnapshot(collection(db, 'menu'), 
-    (snapshot) => {
-      const menu = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MenuItem));
-      set({ menu });
-    },
-    (error) => console.error('Menu Listener Error:', error)
-  );
-
-  const ordersUnsubscribe = onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), 
-    (snapshot) => {
-      const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
-      set({ orders });
-    },
-    (error) => console.error('Orders Listener Error:', error)
-  );
-
-  const settingsUnsubscribe = onSnapshot(collection(db, 'settings'), 
-    (snapshot) => {
-      const settings: any = {};
-      snapshot.docs.forEach(doc => {
-        settings[doc.id] = doc.data();
-      });
-      if (settings.tables) set({ tables: settings.tables.list });
-      if (settings.qris) set({ qrisImage: settings.qris.image });
-    },
-    (error) => console.error('Settings Listener Error:', error)
-  );
-
   return {
     menu: [],
     orders: [],
     tables: ['1', '2', '3', '4', '5'],
     qrisImage: '',
-    isLoading: false,
+    isLoading: true,
+
+    // NEW: Initialization function to be called once
+    initialize: () => {
+      console.log("Initializing Hade Panjingan Store Listeners...");
+      
+      onSnapshot(collection(db, 'menu'), 
+        (snapshot) => {
+          const menu = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MenuItem));
+          console.log(`[Store] Menu Sync: ${menu.length} items.`);
+          set({ menu, isLoading: false });
+        },
+        (error) => {
+          console.error('[Store] Menu Error:', error);
+          set({ isLoading: false });
+        }
+      );
+
+      onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), 
+        (snapshot) => {
+          const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
+          set({ orders });
+        }
+      );
+
+      onSnapshot(collection(db, 'settings'), 
+        (snapshot) => {
+          const settings: any = {};
+          snapshot.docs.forEach(doc => {
+            settings[doc.id] = doc.data();
+          });
+          if (settings.tables) set({ tables: settings.tables.list });
+          if (settings.qris) set({ qrisImage: settings.qris.image });
+        }
+      );
+    },
 
     // Backup Manual Fetch
     refreshData: async () => {
+      set({ isLoading: true });
       try {
         const menuSnap = await getDocs(collection(db, 'menu'));
         const menu = menuSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as MenuItem));
-        set({ menu });
+        set({ menu, isLoading: false });
       } catch (e) {
-        console.error('Manual Refresh Error:', e);
+        console.error('[Store] Refresh Error:', e);
+        set({ isLoading: false });
       }
     },
 
     addOrder: async (order) => {
-      // SAVE INSTANTLY to Firestore with the compressed base64 image
-      // This bypasses Firebase Storage entirely to avoid errors and slow uploads
-      await addDoc(collection(db, 'orders'), {
+      console.log("[Store] Processing order sync...");
+      let finalProof = order.paymentProof;
+
+      // Kompresi gambar bukti transfer agar ringan dan GRATIS (tidak butuh Firebase Storage)
+      if (order.paymentProof && order.paymentProof.startsWith('data:image')) {
+        console.log("[Store] Optimizing payment proof...");
+        // Kita simpan langsung sebagai Base64 yang sudah dikompresi
+        finalProof = order.paymentProof; 
+      }
+
+      console.log("[Store] Creating Firestore document...");
+      const docRef = await addDoc(collection(db, 'orders'), {
         ...order,
+        paymentProof: finalProof,
         status: 'pending',
         createdAt: Date.now()
       });
+      console.log("[Store] Order created successfully with ID:", docRef.id);
     },
 
     updateOrderStatus: async (orderId, status) => {
+      console.log(`[Store] Updating order ${orderId} to ${status}`);
       await updateDoc(doc(db, 'orders', orderId), { status });
     },
 
     addMenuItem: async (item) => {
-      await addDoc(collection(db, 'menu'), item);
+      console.log("[Store] Adding menu item to Firestore...", item.name);
+      try {
+        const docRef = await addDoc(collection(db, 'menu'), item);
+        console.log("[Store] Menu item added with ID:", docRef.id);
+      } catch (err: any) {
+        console.error("[Store] ADD MENU ERROR:", err);
+        alert("GAGAL MENAMBAH MENU: " + err.message);
+      }
     },
 
     updateMenuItem: async (item) => {
       const { id, ...data } = item;
-      await setDoc(doc(db, 'menu', id), data, { merge: true });
+      console.log(`[Store] Updating menu item ${id} (${item.name})`);
+      try {
+        if (!id) throw new Error("ID Menu tidak ditemukan!");
+        await setDoc(doc(db, 'menu', id), data, { merge: true });
+      } catch (err: any) {
+        console.error("UPDATE ERROR:", err);
+        alert("GAGAL UPDATE MENU: " + err.message);
+      }
     },
 
     deleteMenuItem: async (itemId) => {
+      console.log(`[Store] Deleting menu item ${itemId}`);
       await deleteDoc(doc(db, 'menu', itemId));
     },
 
@@ -152,7 +187,6 @@ export const useStore = create<AppState>((set, get) => {
     },
 
     updateOrderProof: async (orderId, proof) => {
-      // If it's a base64 string, upload it first
       let finalProof = proof;
       if (proof.startsWith('data:image')) {
         finalProof = await get().uploadImage(`proofs/${orderId}`, proof);
@@ -184,4 +218,5 @@ export const useStore = create<AppState>((set, get) => {
     }
   };
 });
+
 

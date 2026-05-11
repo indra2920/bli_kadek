@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 
 export default function OwnerView() {
-  const { orders, menu, addMenuItem, updateMenuItem, deleteMenuItem, qrisImage, setQrisImage, tables, addTable, deleteTable, refreshData } = useStore();
+  const { orders, menu, addMenuItem, updateMenuItem, deleteMenuItem, qrisImage, setQrisImage, tables, addTable, deleteTable, refreshData, isLoading } = useStore();
 
   useEffect(() => {
     refreshData();
@@ -235,7 +235,12 @@ export default function OwnerView() {
             </div>
           </div>
           <div className="hide-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '400px', overflowY: 'auto' }}>
-            {menu.length === 0 ? (
+            {isLoading ? (
+              <div style={{ textAlign: 'center', padding: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                <div className="animate-spin" style={{ width: '30px', height: '30px', border: '3px solid var(--primary)', borderTopColor: 'transparent', borderRadius: '50%' }} />
+                <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>Menghubungkan ke Cloud...</p>
+              </div>
+            ) : menu.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '2rem', border: '2px dashed var(--border)', borderRadius: 'var(--radius)' }}>
                 <p style={{ color: 'var(--text-light)', marginBottom: '1rem' }}>Menu is empty.</p>
                 <button 
@@ -324,8 +329,8 @@ export default function OwnerView() {
                   const reader = new FileReader();
                   reader.onloadend = async () => {
                     const base64 = reader.result as string;
-                    const url = await useStore.getState().uploadImage('settings/qris', base64);
-                    await setQrisImage(url);
+                    // Simpan langsung ke database sebagai Base64 agar GRATIS (tidak butuh Firebase Storage)
+                    await setQrisImage(base64);
                   };
                   reader.readAsDataURL(file);
                 }
@@ -377,7 +382,16 @@ export default function OwnerView() {
               </tr>
             </thead>
             <tbody>
-              {orders.length === 0 ? (
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} style={{ padding: '3rem', textAlign: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                      <div className="animate-spin" style={{ width: '20px', height: '20px', border: '2px solid var(--primary)', borderTopColor: 'transparent', borderRadius: '50%' }} />
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>Memuat data transaksi...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : orders.length === 0 ? (
                 <tr><td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-light)' }}>No transactions recorded yet.</td></tr>
               ) : (
                 orders.slice().reverse().slice(0, 8).map(order => (

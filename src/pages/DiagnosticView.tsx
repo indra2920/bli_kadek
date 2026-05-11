@@ -9,6 +9,7 @@ export default function DiagnosticView() {
     menuCount: 0,
     orderCount: 0,
     connectionStatus: 'connecting',
+    errorMessage: '',
     lastSync: 'Never',
     projectId: 'bli-kadek-resto'
   });
@@ -20,10 +21,12 @@ export default function DiagnosticView() {
         ...prev,
         menuCount: snap.size,
         connectionStatus: 'connected',
+        errorMessage: '',
         lastSync: new Date().toLocaleTimeString()
       }));
     }, (err) => {
-      setStats(prev => ({ ...prev, connectionStatus: 'error' }));
+      console.error('Diagnostic Menu Error:', err);
+      setStats(prev => ({ ...prev, connectionStatus: 'error', errorMessage: err.message }));
     });
 
     const unsubOrders = onSnapshot(query(collection(db, 'orders'), limit(1)), (snap) => {
@@ -65,6 +68,12 @@ export default function DiagnosticView() {
           <div style={{ fontSize: '0.9rem', color: '#666' }}>
             Terhubung ke Project: <code style={{ background: '#eee', padding: '2px 6px', borderRadius: '4px' }}>{stats.projectId}</code>
           </div>
+          {stats.connectionStatus === 'error' && (
+            <div style={{ marginTop: '1rem', padding: '0.8rem', background: '#fff5f5', border: '1px solid #feb2b2', borderRadius: '8px', color: '#c53030', fontSize: '0.8rem' }}>
+              <strong>Error Details:</strong><br/>
+              {stats.errorMessage || 'Unknown Firestore Error'}
+            </div>
+          )}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>

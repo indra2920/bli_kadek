@@ -9,7 +9,7 @@ import { compressImage } from '../utils/compression';
 
 export default function CustomerView() {
   const { tableId } = useParams();
-  const { menu, addOrder, orders, qrisImage, refreshData } = useStore();
+  const { menu, addOrder, orders, qrisImage, refreshData, isLoading } = useStore();
   const [cart, setCart] = useState<OrderItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [catIndex, setCatIndex] = useState(0);
@@ -31,25 +31,6 @@ export default function CustomerView() {
   };
   
   const activeOrder = orders.filter(o => o.tableId === tableId).reverse()[0];
-
-  useEffect(() => {
-    console.log("Starting database listener for project: bli-kadek-resto");
-    
-    // Direct listener for this tab with error alerting
-    const unsubscribe = onSnapshot(collection(db, 'menu'), 
-      (snapshot) => {
-        const menuData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MenuItem));
-        console.log("Received menu data, count:", menuData.length);
-        useStore.setState({ menu: menuData });
-      },
-      (error) => {
-        console.error('DATABASE ERROR:', error);
-        alert('MASALAH KONEKSI DATABASE: ' + error.message + '\n\nPastikan Security Rules di Firebase Console diatur ke "allow read, write: if true;"');
-      }
-    );
-    
-    return () => unsubscribe();
-  }, []);
 
   const categories = useMemo(() => {
     return ['All', ...new Set(menu.map(item => item.category))];
@@ -200,10 +181,15 @@ export default function CustomerView() {
         </div>
 
         <div style={{ minHeight: '60vh' }}>
-          {filteredMenu.length === 0 ? (
+          {isLoading ? (
+             <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--text-light)' }}>
+                <Loader2 size={40} className="animate-spin" style={{ margin: '0 auto 1.5rem', color: 'var(--primary)' }} />
+                <p>Menghubungkan ke server...</p>
+             </div>
+          ) : filteredMenu.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--text-light)' }}>
               <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🍃</div>
-              <p style={{ marginBottom: '1.5rem' }}>Sedang memuat menu atau menu masih kosong...</p>
+              <p style={{ marginBottom: '1.5rem' }}>Menu tidak ditemukan atau sedang kosong.</p>
               <button 
                 onClick={handleRefresh}
                 style={{ 
@@ -218,10 +204,11 @@ export default function CustomerView() {
                 }}
               >
                 <RefreshCw size={18} className={isRefreshing ? "animate-spin" : ""} />
-                Cek Menu Sekarang
+                Muat Ulang Menu
               </button>
             </div>
           ) : (
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '1.2rem', padding: '5px' }}>
               {filteredMenu.map(item => (
                 <div key={item.id} className="card-hover" style={{ 
@@ -410,7 +397,8 @@ export default function CustomerView() {
                     const reader = new FileReader();
                     reader.onloadend = async () => {
                       const base64 = reader.result as string;
-                      const compressed = await compressImage(base64);
+                      // Kompresi lebih agresif agar cepat: 600px width, 0.5 quality
+                      const compressed = await compressImage(base64, 600, 0.5);
                       setPaymentProof(compressed);
                     };
                     reader.readAsDataURL(file);
@@ -437,9 +425,9 @@ export default function CustomerView() {
                   {isSubmittingOrder ? (
                     <>
                       <Loader2 size={20} className="animate-spin" />
-                      Sending Order...
+                      Memproses & Mengunggah...
                     </>
-                  ) : 'Confirm Order'}
+                  ) : 'Konfirmasi Pesanan'}
                 </button>
               </div>
             </div>
