@@ -13,6 +13,8 @@ export default function CashierView() {
   
   const prevPendingCount = useRef(pendingOrders.length);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audioEnabled, setAudioEnabled] = useState(false);
+  const intervalRef = useRef<any>(null);
 
   useEffect(() => {
     // Initialize audio
@@ -25,13 +27,26 @@ export default function CashierView() {
       const latestOrder = pendingOrders[pendingOrders.length - 1];
       setNewOrderPopup(latestOrder);
       
-      // Play sound
-      if (audioRef.current) {
+      // Start looping sound
+      if (audioEnabled && audioRef.current) {
         audioRef.current.play().catch(e => console.log('Audio play blocked:', e));
+        
+        // Loop every 3 seconds
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        intervalRef.current = setInterval(() => {
+          if (audioRef.current) audioRef.current.play().catch(() => {});
+        }, 3000);
       }
     }
     prevPendingCount.current = pendingOrders.length;
-  }, [pendingOrders]);
+  }, [pendingOrders, audioEnabled]);
+
+  // Stop sound when popup is closed
+  useEffect(() => {
+    if (!newOrderPopup && intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+  }, [newOrderPopup]);
 
   const handleVerify = (orderId: string) => {
     updateOrderStatus(orderId, 'verified');
@@ -68,6 +83,36 @@ export default function CashierView() {
               </div>
             </div>
           </div>
+          
+          <button 
+            onClick={() => {
+              setAudioEnabled(!audioEnabled);
+              if (!audioEnabled && audioRef.current) {
+                audioRef.current.play().then(() => {
+                  audioRef.current?.pause();
+                  audioRef.current!.currentTime = 0;
+                }).catch(() => {});
+              }
+            }}
+            className="no-print"
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.6rem', 
+              padding: '0.8rem 1.2rem', 
+              background: audioEnabled ? 'var(--accent)' : 'var(--surface)', 
+              color: audioEnabled ? 'white' : 'var(--text-light)',
+              borderRadius: '30px',
+              border: '1px solid var(--border)',
+              fontSize: '0.85rem',
+              fontWeight: '700',
+              boxShadow: 'var(--shadow-sm)',
+              transition: 'all 0.3s'
+            }}
+          >
+            <BellRing size={18} />
+            {audioEnabled ? 'SOUND ACTIVE' : 'ENABLE SOUND'}
+          </button>
         </div>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
