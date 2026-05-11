@@ -13,7 +13,7 @@ export default function CashierView() {
   
   const prevPendingCount = useRef(pendingOrders.length);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [audioEnabled, setAudioEnabled] = useState(false);
+  const [isSystemStarted, setIsSystemStarted] = useState(false);
   const intervalRef = useRef<any>(null);
 
   useEffect(() => {
@@ -27,8 +27,8 @@ export default function CashierView() {
       const latestOrder = pendingOrders[pendingOrders.length - 1];
       setNewOrderPopup(latestOrder);
       
-      // Start looping sound
-      if (audioEnabled && audioRef.current) {
+      // Start looping sound if system is started
+      if (isSystemStarted && audioRef.current) {
         audioRef.current.play().catch(e => console.log('Audio play blocked:', e));
         
         // Loop every 3 seconds
@@ -39,7 +39,7 @@ export default function CashierView() {
       }
     }
     prevPendingCount.current = pendingOrders.length;
-  }, [pendingOrders, audioEnabled]);
+  }, [pendingOrders, isSystemStarted]);
 
   // Stop sound when popup is closed
   useEffect(() => {
@@ -84,35 +84,12 @@ export default function CashierView() {
             </div>
           </div>
           
-          <button 
-            onClick={() => {
-              setAudioEnabled(!audioEnabled);
-              if (!audioEnabled && audioRef.current) {
-                audioRef.current.play().then(() => {
-                  audioRef.current?.pause();
-                  audioRef.current!.currentTime = 0;
-                }).catch(() => {});
-              }
-            }}
-            className="no-print"
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.6rem', 
-              padding: '0.8rem 1.2rem', 
-              background: audioEnabled ? 'var(--accent)' : 'var(--surface)', 
-              color: audioEnabled ? 'white' : 'var(--text-light)',
-              borderRadius: '30px',
-              border: '1px solid var(--border)',
-              fontSize: '0.85rem',
-              fontWeight: '700',
-              boxShadow: 'var(--shadow-sm)',
-              transition: 'all 0.3s'
-            }}
-          >
-            <BellRing size={18} />
-            {audioEnabled ? 'SOUND ACTIVE' : 'ENABLE SOUND'}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+             <div style={{ padding: '0.5rem 1rem', background: '#e6fffa', color: '#38b2ac', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid #b2f5ea' }}>
+                <div style={{ width: '8px', height: '8px', background: '#38b2ac', borderRadius: '50%', animation: 'pulse 1.5s infinite' }} />
+                SYSTEM ONLINE
+             </div>
+          </div>
         </div>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
@@ -327,6 +304,33 @@ export default function CashierView() {
 
             <button onClick={() => setNewOrderPopup(null)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', color: 'var(--text-light)', background: 'none' }}>
               <X size={24} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* System Activation Overlay */}
+      {!isSystemStarted && (
+        <div style={{ position: 'fixed', inset: 0, background: 'var(--bg)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+          <div className="card animate-fade-in" style={{ padding: '3rem', textAlign: 'center', maxWidth: '500px', width: '100%', boxShadow: '0 30px 60px rgba(0,0,0,0.1)' }}>
+            <div style={{ width: '100px', height: '100px', background: 'var(--surface)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem', border: '2px solid var(--accent)' }}>
+              <BellRing color="var(--accent)" size={50} />
+            </div>
+            <h1 style={{ fontSize: '2.2rem', color: 'var(--secondary)', marginBottom: '1rem' }}>Dashboard Kasir</h1>
+            <p style={{ color: 'var(--text-light)', marginBottom: '2.5rem', fontSize: '1.1rem' }}>Klik tombol di bawah untuk mengaktifkan sistem notifikasi suara otomatis.</p>
+            <button 
+              onClick={() => {
+                setIsSystemStarted(true);
+                if (audioRef.current) {
+                  audioRef.current.play().then(() => {
+                    audioRef.current?.pause();
+                    audioRef.current!.currentTime = 0;
+                  }).catch(() => {});
+                }
+              }}
+              style={{ width: '100%', background: 'var(--accent)', color: 'white', padding: '1.5rem', fontSize: '1.2rem', fontWeight: '800' }}
+            >
+              Mulai Sistem Sekarang
             </button>
           </div>
         </div>
