@@ -1,18 +1,22 @@
 import { useStore, MenuItem } from '../store/useStore';
+import { QRCodeCanvas } from 'qrcode.react';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { BarChart3, TrendingUp, UtensilsCrossed, ArrowLeft, DollarSign, ShoppingBag, Plus, Edit2, Trash2, X, Upload, Activity } from 'lucide-react';
 import { compressImage } from '../utils/compression';
 import { Link } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
+import { translations } from '../utils/translations';
 
 export default function OwnerView() {
-  const { orders, menu, addMenuItem, updateMenuItem, deleteMenuItem, qrisImage, setQrisImage, tables, addTable, deleteTable, refreshData, isLoading } = useStore();
+  const { orders, menu, addMenuItem, updateMenuItem, deleteMenuItem, qrisImage, setQrisImage, tables, addTable, deleteTable, refreshData, isLoading, language, setLanguage } = useStore();
+  const t = translations[language];
 
   useEffect(() => {
     refreshData();
   }, []);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [printingTable, setPrintingTable] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -122,6 +126,14 @@ export default function OwnerView() {
     }
   };
 
+  const handlePrintQR = (tableId: string) => {
+    setPrintingTable(tableId);
+    setTimeout(() => {
+      window.print();
+      setPrintingTable(null);
+    }, 500);
+  };
+
   return (
     <div className="container animate-fade-in" style={{ padding: '2rem 0' }}>
       <header style={{ marginBottom: '3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -133,13 +145,17 @@ export default function OwnerView() {
             <img src="/logo.png" alt="Logo" style={{ width: '65px', height: '65px', borderRadius: '50%', objectFit: 'cover', border: '2px solid white', boxShadow: 'var(--shadow-sm)' }} />
             <div>
               <h1 className="brand" style={{ fontSize: '1.8rem', color: 'var(--secondary)', lineHeight: 1 }}>Hade Panjingan</h1>
-              <p style={{ fontSize: '0.65rem', color: 'var(--primary)', fontWeight: '800', letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: '0.2rem' }}>Foodcourt & Homestay</p>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '700', marginTop: '2px' }}>OWNER DASHBOARD</p>
+              <p style={{ fontSize: '0.65rem', color: 'var(--primary)', fontWeight: '800', letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: '0.2rem' }}>{t.foodcourt}</p>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '700', marginTop: '2px' }}>{t.ownerDashboard}</p>
               <Link to="/debug" style={{ fontSize: '0.65rem', color: 'var(--primary)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', textDecoration: 'none' }}>
-                <Activity size={10} /> CEK KONEKSI SERVER
+                <Activity size={10} /> {language === 'en' ? 'CHECK CONNECTION' : 'CEK KONEKSI SERVER'}
               </Link>
             </div>
           </div>
+        </div>
+        <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: '20px', padding: '2px', border: '1px solid var(--border)', width: 'fit-content' }}>
+           <button onClick={() => setLanguage('id')} style={{ padding: '4px 12px', borderRadius: '18px', fontSize: '0.75rem', fontWeight: '800', background: language === 'id' ? 'var(--primary)' : 'transparent', color: language === 'id' ? 'white' : 'var(--text-light)' }}>ID</button>
+           <button onClick={() => setLanguage('en')} style={{ padding: '4px 12px', borderRadius: '18px', fontSize: '0.75rem', fontWeight: '800', background: language === 'en' ? 'var(--primary)' : 'transparent', color: language === 'en' ? 'white' : 'var(--text-light)' }}>EN</button>
         </div>
       </header>
 
@@ -152,19 +168,19 @@ export default function OwnerView() {
       }}>
         <StatCard 
           icon={<DollarSign size={24} color="#27ae60" />} 
-          label="Total Revenue" 
+          label={t.revenue} 
           value={`Rp ${totalSales.toLocaleString()}`}
           trend="+12.5% from last week"
         />
         <StatCard 
           icon={<ShoppingBag size={24} color="#3498db" />} 
-          label="Total Orders" 
+          label={t.totalOrders} 
           value={totalOrders.toString()}
           trend={`${orders.filter(o => o.status === 'pending').length} pending orders`}
         />
         <StatCard 
           icon={<TrendingUp size={24} color="#e67e22" />} 
-          label="Avg. Order Value" 
+          label={t.avgOrderValue} 
           value={`Rp ${avgOrderValue.toLocaleString()}`}
           trend="Steady growth"
         />
@@ -174,7 +190,7 @@ export default function OwnerView() {
         {/* Sales Performance */}
         <section className="card" style={{ padding: '2rem' }}>
           <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.25rem' }}>
-            <BarChart3 size={20} color="var(--primary)" /> Sales Performance
+            <BarChart3 size={20} color="var(--primary)" /> {t.salesPerformance}
           </h2>
           <div style={{ height: '200px', display: 'flex', alignItems: 'flex-end', gap: '12px', padding: '0 10px' }}>
             {salesTrend.map((val, i) => (
@@ -202,7 +218,7 @@ export default function OwnerView() {
         <section className="card" style={{ padding: '2rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.25rem' }}>
-              <UtensilsCrossed size={20} color="var(--primary)" /> Menus
+              <UtensilsCrossed size={20} color="var(--primary)" /> {t.menus}
             </h2>
             <div style={{ display: 'flex', gap: '0.8rem' }}>
               <button 
@@ -224,13 +240,13 @@ export default function OwnerView() {
                 }}
                 style={{ padding: '0.6rem 1rem', background: '#27ae60', color: 'white', fontSize: '0.8rem' }}
               >
-                Sync to Cloud
+                {t.syncCloud}
               </button>
               <button 
                 onClick={() => handleOpenModal()}
                 style={{ padding: '0.6rem 1.2rem', background: 'var(--primary)', color: 'white', fontSize: '0.85rem', gap: '0.4rem' }}
               >
-                <Plus size={16} /> Add Item
+                <Plus size={16} /> {t.addItem}
               </button>
             </div>
           </div>
@@ -287,7 +303,7 @@ export default function OwnerView() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', marginTop: '2.5rem' }}>
         {/* Table Management */}
         <section className="card" style={{ padding: '2rem' }}>
-          <h2 style={{ marginBottom: '1.5rem', fontSize: '1.25rem' }}>Table Management</h2>
+          <h2 style={{ marginBottom: '1.5rem', fontSize: '1.25rem' }}>{t.tableManagement}</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '1rem' }}>
             {tables.map(table => (
               <div key={table} style={{ position: 'relative', textAlign: 'center', padding: '1.2rem', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', background: 'var(--bg)' }}>
@@ -297,8 +313,14 @@ export default function OwnerView() {
                 >
                   <Trash2 size={12} color="#e74c3c" />
                 </button>
-                <div style={{ fontWeight: '700', fontSize: '1.1rem', color: 'var(--primary)' }}>{table}</div>
-                <div style={{ fontSize: '0.65rem', color: 'var(--text-light)', marginTop: '0.2rem' }}>Active QR</div>
+                <div style={{ fontWeight: '700', fontSize: '1.1rem', color: 'var(--primary)' }}>{t.table} {table}</div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--text-light)', marginTop: '0.2rem' }}>{t.activeQR}</div>
+                <button 
+                  onClick={() => handlePrintQR(table)}
+                  style={{ marginTop: '0.8rem', padding: '0.4rem 0.8rem', background: 'var(--primary)', color: 'white', fontSize: '0.7rem', width: '100%', borderRadius: '6px' }}
+                >
+                  {t.printQR}
+                </button>
               </div>
             ))}
             <button 
@@ -309,15 +331,15 @@ export default function OwnerView() {
               style={{ padding: '1.2rem', border: '2px dashed var(--border)', background: 'none', flexDirection: 'column', color: 'var(--text-light)' }}
             >
               <Plus size={20} />
-              <span style={{ fontSize: '0.75rem', marginTop: '0.4rem' }}>Add Table</span>
+              <span style={{ fontSize: '0.75rem', marginTop: '0.4rem' }}>{t.addTable}</span>
             </button>
           </div>
         </section>
 
         {/* QRIS Configuration */}
         <section className="card" style={{ padding: '2rem' }}>
-          <h2 style={{ marginBottom: '1rem', fontSize: '1.25rem' }}>Payment QRIS</h2>
-          <p style={{ color: 'var(--text-light)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>Update your QRIS for direct table payments.</p>
+          <h2 style={{ marginBottom: '1rem', fontSize: '1.25rem' }}>{t.paymentQRIS}</h2>
+          <p style={{ color: 'var(--text-light)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>{t.qrisUpdateDesc}</p>
           <div 
             onClick={() => {
               const input = document.createElement('input');
@@ -357,11 +379,11 @@ export default function OwnerView() {
             ) : (
               <>
                 <Upload size={40} color="var(--text-light)" />
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginTop: '0.8rem' }}>Click to Upload</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginTop: '0.8rem' }}>{t.clickToUpload}</span>
               </>
             )}
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: '0.7rem', padding: '6px', textAlign: 'center' }}>
-              Change QRIS Image
+              {t.changeQRIS}
             </div>
           </div>
         </section>
@@ -369,16 +391,16 @@ export default function OwnerView() {
 
       {/* Recent Orders */}
       <section className="card" style={{ marginTop: '2.5rem', padding: '2rem', overflowX: 'auto' }}>
-        <h2 style={{ marginBottom: '1.5rem', fontSize: '1.25rem' }}>Recent Activity</h2>
+        <h2 style={{ marginBottom: '1.5rem', fontSize: '1.25rem' }}>{t.recentActivity}</h2>
         <div style={{ minWidth: '600px' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ textAlign: 'left', borderBottom: '2px solid var(--border)', color: 'var(--text-light)', fontSize: '0.85rem' }}>
-                <th style={{ padding: '1rem' }}>ORDER ID</th>
-                <th style={{ padding: '1rem' }}>TABLE</th>
-                <th style={{ padding: '1rem' }}>STATUS</th>
-                <th style={{ padding: '1rem' }}>TOTAL</th>
-                <th style={{ padding: '1rem' }}>TIME</th>
+                <th style={{ padding: '1rem' }}>{t.orderId}</th>
+                <th style={{ padding: '1rem' }}>{t.tableManagement.split(' ')[0].toUpperCase()}</th>
+                <th style={{ padding: '1rem' }}>{t.status}</th>
+                <th style={{ padding: '1rem' }}>{t.total.toUpperCase()}</th>
+                <th style={{ padding: '1rem' }}>{t.time}</th>
               </tr>
             </thead>
             <tbody>
@@ -488,6 +510,44 @@ export default function OwnerView() {
         </div>
       )}
 
+      {/* Print Template for Table QR */}
+      {printingTable && (
+        <div className="print-only" style={{ textAlign: 'center', padding: '40px' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <img src="/logo.png" alt="Logo" style={{ width: '80px', height: '80px', borderRadius: '50%' }} />
+            <h1 style={{ fontSize: '24px', margin: '10px 0' }}>Hade Panjingan</h1>
+            <p style={{ fontSize: '14px', color: '#666' }}>Foodcourt & Homestay</p>
+          </div>
+          
+          <div style={{ display: 'inline-block', padding: '20px', border: '2px solid #333', borderRadius: '20px', background: 'white' }}>
+            <QRCodeCanvas 
+              value={`${window.location.origin}/table/${printingTable}`}
+              size={256}
+              level="H"
+              includeMargin={true}
+            />
+          </div>
+          
+          <h2 style={{ fontSize: '48px', marginTop: '30px', fontWeight: '800' }}>MEJA {printingTable}</h2>
+          <p style={{ fontSize: '16px', marginTop: '10px', color: '#333' }}>Silakan Scan untuk Memesan</p>
+          
+          <div style={{ marginTop: '40px', fontSize: '12px', color: '#999' }}>
+            Powered by Bli Kadek Smart Menu
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @media print {
+          .no-print { display: none !important; }
+          .print-only { display: block !important; visibility: visible !important; }
+          body { background: white !important; }
+          .container { padding: 0 !important; max-width: none !important; }
+        }
+        @media screen {
+          .print-only { display: none; }
+        }
+      `}</style>
     </div>
   );
 }

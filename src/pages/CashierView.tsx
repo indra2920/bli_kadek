@@ -2,9 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useStore, OrderStatus, Order } from '../store/useStore';
 import { CheckCircle, Printer, AlertCircle, Clock, ArrowLeft, Eye, BellRing, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { translations } from '../utils/translations';
 
 export default function CashierView() {
-  const { orders, updateOrderStatus } = useStore();
+  const { orders, updateOrderStatus, language, setLanguage } = useStore();
+  const t = translations[language];
   const [printingOrder, setPrintingOrder] = useState<Order | null>(null);
   const [newOrderPopup, setNewOrderPopup] = useState<Order | null>(null);
   
@@ -78,16 +80,20 @@ export default function CashierView() {
               <img src="/logo.png" alt="Logo" style={{ width: '65px', height: '65px', borderRadius: '50%', objectFit: 'cover', border: '2px solid white', boxShadow: 'var(--shadow-sm)' }} />
               <div>
                 <h1 className="brand" style={{ fontSize: '1.8rem', color: 'var(--secondary)', lineHeight: 1 }}>Hade Panjingan</h1>
-                <p style={{ fontSize: '0.65rem', color: 'var(--primary)', fontWeight: '800', letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: '0.2rem' }}>Foodcourt & Homestay</p>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '700', marginTop: '2px' }}>CASHIER DASHBOARD</p>
+                <p style={{ fontSize: '0.65rem', color: 'var(--primary)', fontWeight: '800', letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: '0.2rem' }}>{t.foodcourt}</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '700', marginTop: '2px' }}>{t.cashierDashboard}</p>
               </div>
             </div>
           </div>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+             <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: '20px', padding: '2px', border: '1px solid var(--border)' }}>
+               <button onClick={() => setLanguage('id')} style={{ padding: '4px 12px', borderRadius: '18px', fontSize: '0.75rem', fontWeight: '800', background: language === 'id' ? 'var(--primary)' : 'transparent', color: language === 'id' ? 'white' : 'var(--text-light)' }}>ID</button>
+               <button onClick={() => setLanguage('en')} style={{ padding: '4px 12px', borderRadius: '18px', fontSize: '0.75rem', fontWeight: '800', background: language === 'en' ? 'var(--primary)' : 'transparent', color: language === 'en' ? 'white' : 'var(--text-light)' }}>EN</button>
+             </div>
              <div style={{ padding: '0.5rem 1rem', background: '#e6fffa', color: '#38b2ac', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid #b2f5ea' }}>
                 <div style={{ width: '8px', height: '8px', background: '#38b2ac', borderRadius: '50%', animation: 'pulse 1.5s infinite' }} />
-                SYSTEM ONLINE
+                {t.systemOnline}
              </div>
           </div>
         </div>
@@ -95,14 +101,14 @@ export default function CashierView() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
           <div className="card" style={{ padding: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontWeight: '600' }}>PENDING VERIFICATION</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontWeight: '600' }}>{t.pendingVerification}</p>
               <h2 style={{ color: 'orange', fontSize: '1.8rem' }}>{pendingOrders.length}</h2>
             </div>
             <AlertCircle color="orange" size={32} opacity={0.2} />
           </div>
           <div className="card" style={{ padding: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontWeight: '600' }}>ACTIVE ORDERS</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontWeight: '600' }}>{t.activeOrders}</p>
               <h2 style={{ color: 'var(--primary)', fontSize: '1.8rem' }}>{activeOrders.length}</h2>
             </div>
             <Clock color="var(--primary)" size={32} opacity={0.2} />
@@ -114,20 +120,21 @@ export default function CashierView() {
         {/* Pending Verification */}
         <section>
           <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '1.3rem' }}>
-            <AlertCircle color="orange" size={20} /> Needs Verification
+            <AlertCircle color="orange" size={20} /> {t.needsVerification}
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
             {pendingOrders.length === 0 ? (
               <div style={{ padding: '4rem 2rem', textAlign: 'center', background: 'rgba(0,0,0,0.02)', borderRadius: 'var(--radius)', border: '2px dashed var(--border)' }}>
-                <p style={{ color: 'var(--text-light)' }}>All payments verified! 🎉</p>
+                <p style={{ color: 'var(--text-light)' }}>{t.allVerified}</p>
               </div>
             ) : (
               pendingOrders.map(order => (
                 <div key={order.id} className="card animate-fade-in" style={{ padding: '1.5rem', borderLeft: '6px solid orange' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.2rem' }}>
                     <div>
-                      <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>Table {order.tableId}</h3>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '600' }}>ORDER #{order.id.toUpperCase().slice(0, 8)}</p>
+                      <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>{t.table} {order.tableId}</h3>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--secondary)', fontWeight: '700' }}>{order.customerName}</p>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '600' }}>{t.orderId.split(' ')[0]} #{order.id.toUpperCase().slice(0, 8)}</p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                        <p style={{ fontWeight: '800', fontSize: '1.3rem', color: 'var(--secondary)' }}>Rp {order.total.toLocaleString()}</p>
@@ -137,7 +144,19 @@ export default function CashierView() {
                   
                   {/* Payment Proof Preview */}
                   <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'var(--bg)', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                    <p style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-light)', marginBottom: '0.8rem', textTransform: 'uppercase' }}>Payment Proof</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                      <p style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-light)', textTransform: 'uppercase' }}>{t.paymentProof}</p>
+                      <div style={{ 
+                        padding: '4px 10px', 
+                        borderRadius: '6px', 
+                        fontSize: '0.7rem', 
+                        fontWeight: '800',
+                        background: order.paymentMethod === 'qris' ? '#e1f5fe' : '#fbe9e7',
+                        color: order.paymentMethod === 'qris' ? '#0288d1' : '#d84315'
+                      }}>
+                        {order.paymentMethod === 'qris' ? 'QRIS' : 'TUNAI'}
+                      </div>
+                    </div>
                     {order.paymentProof ? (
                       <div 
                         onClick={() => {
@@ -152,7 +171,7 @@ export default function CashierView() {
                         </div>
                       </div>
                     ) : (
-                      <div style={{ padding: '1.5rem', textAlign: 'center', color: '#e74c3c', fontSize: '0.85rem', fontWeight: '600' }}>No proof uploaded</div>
+                      <div style={{ padding: '1.5rem', textAlign: 'center', color: '#e74c3c', fontSize: '0.85rem', fontWeight: '600' }}>{t.noProof}</div>
                     )}
                   </div>
 
@@ -177,7 +196,7 @@ export default function CashierView() {
                       onClick={() => handleVerify(order.id)}
                       style={{ flex: 1, background: 'var(--accent)', color: 'white', padding: '1rem', gap: '0.6rem', fontSize: '0.95rem' }}
                     >
-                      <CheckCircle size={18} /> Verify Payment
+                      <CheckCircle size={18} /> {t.verifyPayment}
                     </button>
                   </div>
                 </div>
@@ -189,11 +208,11 @@ export default function CashierView() {
         {/* Verified / Processing */}
         <section>
           <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '1.3rem' }}>
-            <Clock color="var(--primary)" size={20} /> Active Orders
+            <Clock color="var(--primary)" size={20} /> {t.activeOrders}
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {activeOrders.length === 0 ? (
-               <p style={{ color: 'var(--text-light)', textAlign: 'center', padding: '2rem' }}>No orders in progress.</p>
+               <p style={{ color: 'var(--text-light)', textAlign: 'center', padding: '2rem' }}>{language === 'en' ? 'No orders in progress.' : 'Tidak ada pesanan dalam antrean.'}</p>
             ) : (
               activeOrders.map(order => (
                 <div key={order.id} className="card" style={{ padding: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -202,10 +221,10 @@ export default function CashierView() {
                       {order.tableId}
                     </div>
                     <div>
-                      <h3 style={{ fontSize: '0.95rem', fontWeight: '700' }}>Table {order.tableId}</h3>
+                      <h3 style={{ fontSize: '0.95rem', fontWeight: '700' }}>{t.table} {order.tableId}</h3>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                         <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: order.status === 'verified' ? 'orange' : 'var(--primary)' }} />
-                        <span style={{ fontSize: '0.75rem', textTransform: 'capitalize', color: order.status === 'verified' ? 'orange' : 'var(--primary)', fontWeight: '700' }}>{order.status === 'processing' ? 'Proses Masak' : order.status}</span>
+                        <span style={{ fontSize: '0.75rem', textTransform: 'capitalize', color: order.status === 'verified' ? 'orange' : 'var(--primary)', fontWeight: '700' }}>{order.status === 'processing' ? t.prosesMasak : order.status}</span>
                       </div>
                     </div>
                   </div>
@@ -218,7 +237,7 @@ export default function CashierView() {
                       <button 
                         onClick={() => handlePrint(order)}
                         style={{ padding: '0.8rem', background: 'var(--secondary)', color: 'white' }}
-                        title="Print Kitchen Slip"
+                        title={t.printKitchenSlip}
                       >
                         <Printer size={18} />
                       </button>
@@ -277,12 +296,14 @@ export default function CashierView() {
               <BellRing color="var(--accent)" size={40} className="animate-pulse" />
             </div>
             
-            <h2 style={{ fontSize: '2rem', color: 'var(--secondary)', marginBottom: '0.5rem' }}>Pesanan Baru!</h2>
-            <p style={{ color: 'var(--text-light)', fontSize: '1.1rem', marginBottom: '2rem' }}>Meja <strong style={{ color: 'var(--secondary)', fontSize: '1.4rem' }}>{newOrderPopup.tableId}</strong> baru saja memesan.</p>
+            <h2 style={{ fontSize: '2rem', color: 'var(--secondary)', marginBottom: '0.5rem' }}>{t.newOrder}</h2>
+            <p style={{ color: 'var(--text-light)', fontSize: '1.1rem', marginBottom: '2rem' }}>
+              {t.newOrderDesc.replace('{table}', newOrderPopup.tableId).replace('{name}', newOrderPopup.customerName)}
+            </p>
             
             <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem', background: 'var(--bg)', border: '1px solid var(--border)' }}>
                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.9rem', color: 'var(--text-light)', fontWeight: '600' }}>TOTAL TRANSAKSI</span>
+                  <span style={{ fontSize: '0.9rem', color: 'var(--text-light)', fontWeight: '600' }}>{t.totalTransaction}</span>
                   <span style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--secondary)' }}>Rp {newOrderPopup.total.toLocaleString()}</span>
                </div>
             </div>
@@ -292,13 +313,13 @@ export default function CashierView() {
                 onClick={() => setNewOrderPopup(null)}
                 style={{ flex: 1, background: 'var(--bg)', color: 'var(--text-light)', padding: '1.2rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}
               >
-                Nanti Saja
+                {t.later}
               </button>
               <button 
                 onClick={() => handleVerify(newOrderPopup.id)}
                 style={{ flex: 2, background: 'var(--accent)', color: 'white', padding: '1.2rem', borderRadius: 'var(--radius)', fontSize: '1.1rem', fontWeight: '800', boxShadow: '0 10px 20px rgba(212, 163, 115, 0.3)' }}
               >
-                Lihat & Verifikasi
+                {t.viewVerify}
               </button>
             </div>
 
@@ -316,8 +337,8 @@ export default function CashierView() {
             <div style={{ width: '100px', height: '100px', background: 'var(--surface)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem', border: '2px solid var(--accent)' }}>
               <BellRing color="var(--accent)" size={50} />
             </div>
-            <h1 style={{ fontSize: '2.2rem', color: 'var(--secondary)', marginBottom: '1rem' }}>Dashboard Kasir</h1>
-            <p style={{ color: 'var(--text-light)', marginBottom: '2.5rem', fontSize: '1.1rem' }}>Klik tombol di bawah untuk mengaktifkan sistem notifikasi suara otomatis.</p>
+            <h1 style={{ fontSize: '2.2rem', color: 'var(--secondary)', marginBottom: '1rem' }}>{t.cashierDashboard}</h1>
+            <p style={{ color: 'var(--text-light)', marginBottom: '2.5rem', fontSize: '1.1rem' }}>{t.activateNotif}</p>
             <button 
               onClick={() => {
                 setIsSystemStarted(true);
@@ -330,7 +351,7 @@ export default function CashierView() {
               }}
               style={{ width: '100%', background: 'var(--accent)', color: 'white', padding: '1.5rem', fontSize: '1.2rem', fontWeight: '800' }}
             >
-              Mulai Sistem Sekarang
+              {t.startSystem}
             </button>
           </div>
         </div>

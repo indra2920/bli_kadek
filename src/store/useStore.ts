@@ -33,9 +33,11 @@ export interface OrderItem extends MenuItem {
 export interface Order {
   id: string;
   tableId: string;
+  customerName: string;
   items: OrderItem[];
   total: number;
   status: OrderStatus;
+  paymentMethod: 'cash' | 'qris';
   createdAt: number;
   paymentProof?: string;
 }
@@ -58,6 +60,9 @@ interface AppState {
   uploadImage: (path: string, base64: string) => Promise<string>;
   seedData: () => Promise<void>;
   refreshData: () => Promise<void>;
+  language: 'id' | 'en';
+  setLanguage: (lang: 'id' | 'en') => void;
+  initialize: () => void;
 }
 
 export const useStore = create<AppState>((set, get) => {
@@ -67,6 +72,8 @@ export const useStore = create<AppState>((set, get) => {
     tables: ['1', '2', '3', '4', '5'],
     qrisImage: '',
     isLoading: true,
+    language: 'id',
+    setLanguage: (lang: 'id' | 'en') => set({ language: lang }),
 
     // NEW: Initialization function to be called once
     initialize: () => {

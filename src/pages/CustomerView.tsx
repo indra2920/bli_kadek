@@ -6,10 +6,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { compressImage } from '../utils/compression';
+import { translations } from '../utils/translations';
 
 export default function CustomerView() {
   const { tableId } = useParams();
-  const { menu, addOrder, orders, qrisImage, refreshData, isLoading } = useStore();
+  const { menu, addOrder, orders, qrisImage, refreshData, isLoading, language, setLanguage } = useStore();
+  const t = translations[language];
   const [cart, setCart] = useState<OrderItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [catIndex, setCatIndex] = useState(0);
@@ -17,6 +19,8 @@ export default function CustomerView() {
   const [checkoutStep, setCheckoutStep] = useState<'browsing' | 'payment' | 'tracking'>('browsing');
   const [tempOrderId, setTempOrderId] = useState<string | null>(null);
   const [paymentProof, setPaymentProof] = useState<string | null>(null);
+  const [customerName, setCustomerName] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'qris'>('qris');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -76,17 +80,27 @@ export default function CustomerView() {
   };
 
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
-  const handleSubmitPayment = async () => {
-    if (!tempOrderId || !paymentProof) return;
+  const handleSubmitOrder = async () => {
+    if (!customerName.trim()) {
+      alert('Silakan isi nama Anda terlebih dahulu');
+      return;
+    }
+    if (paymentMethod === 'qris' && !paymentProof) {
+      alert('Silakan unggah bukti pembayaran QRIS');
+      return;
+    }
+    
     setIsSubmittingOrder(true);
     try {
       const newOrder: any = {
         tableId: tableId || '?',
+        customerName: customerName,
         items: cart,
         total,
-        status: 'pending',
+        status: paymentMethod === 'cash' ? 'verified' : 'pending',
+        paymentMethod: paymentMethod,
         createdAt: Date.now(),
-        paymentProof: paymentProof
+        paymentProof: paymentMethod === 'qris' ? paymentProof : null
       };
       await addOrder(newOrder);
       setCart([]);
@@ -138,21 +152,20 @@ export default function CustomerView() {
           <img src="/logo.png" alt="Logo" style={{ width: '55px', height: '55px', borderRadius: '50%', objectFit: 'cover', border: '2px solid white', boxShadow: 'var(--shadow-sm)' }} />
           <div>
             <h1 className="brand" style={{ fontSize: '1.3rem', color: 'var(--secondary)', lineHeight: 1.1 }}>Hade Panjingan</h1>
-            <p style={{ fontSize: '0.6rem', color: 'var(--primary)', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '1px' }}>Foodcourt & Homestay</p>
+            <p style={{ fontSize: '0.6rem', color: 'var(--primary)', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '1px' }}>{t.foodcourt}</p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-light)', fontSize: '0.75rem' }}>
               <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#27ae60' }} />
-              Table {tableId}
+              {t.table} {tableId}
             </div>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '0.8rem' }}>
-          {activeOrder && (
-            <button onClick={() => setCheckoutStep('tracking')} style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '0.6rem 1.1rem', borderRadius: '40px', color: 'var(--primary-dark)' }}>
-              <Loader2 size={18} className={activeOrder.status !== 'completed' ? "animate-spin" : ""} />
-            </button>
-          )}
-          <button onClick={() => setIsCartOpen(true)} style={{ background: 'var(--secondary)', color: 'white', padding: '0.8rem 1.4rem', borderRadius: '40px', gap: '0.8rem', boxShadow: 'var(--shadow-sm)' }}>
-            <ShoppingCart size={20} /> <span style={{ fontWeight: '800' }}>{cart.length}</span>
+        <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: '20px', padding: '2px', border: '1px solid var(--border)' }}>
+             <button onClick={() => setLanguage('id')} style={{ padding: '4px 10px', borderRadius: '18px', fontSize: '0.7rem', fontWeight: '800', background: language === 'id' ? 'var(--primary)' : 'transparent', color: language === 'id' ? 'white' : 'var(--text-light)' }}>ID</button>
+             <button onClick={() => setLanguage('en')} style={{ padding: '4px 10px', borderRadius: '18px', fontSize: '0.7rem', fontWeight: '800', background: language === 'en' ? 'var(--primary)' : 'transparent', color: language === 'en' ? 'white' : 'var(--text-light)' }}>EN</button>
+          </div>
+          <button onClick={() => setIsCartOpen(true)} style={{ background: 'var(--secondary)', color: 'white', padding: '0.7rem 1rem', borderRadius: '40px', gap: '0.5rem', boxShadow: 'var(--shadow-sm)', display: 'flex', alignItems: 'center' }}>
+            <ShoppingCart size={18} /> <span style={{ fontWeight: '800' }}>{cart.length}</span>
           </button>
         </div>
       </div>
@@ -168,7 +181,7 @@ export default function CustomerView() {
             <ChevronLeft size={20} />
           </button>
           <div style={{ textAlign: 'center' }}>
-            <h2 style={{ fontSize: '1.4rem', color: 'var(--secondary)' }}>{categories[catIndex]}</h2>
+            <h2 style={{ fontSize: '1.4rem', color: 'var(--secondary)' }}>{catIndex === 0 && language === 'en' ? 'All' : categories[catIndex]}</h2>
             <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', letterSpacing: '0.1em' }}>PAGE {catIndex + 1} OF {categories.length}</p>
           </div>
           <button 
@@ -184,12 +197,12 @@ export default function CustomerView() {
           {isLoading ? (
              <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--text-light)' }}>
                 <Loader2 size={40} className="animate-spin" style={{ margin: '0 auto 1.5rem', color: 'var(--primary)' }} />
-                <p>Menghubungkan ke server...</p>
+                <p>{t.loading}</p>
              </div>
           ) : filteredMenu.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--text-light)' }}>
               <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🍃</div>
-              <p style={{ marginBottom: '1.5rem' }}>Menu tidak ditemukan atau sedang kosong.</p>
+              <p style={{ marginBottom: '1.5rem' }}>{t.emptyMenu}</p>
               <button 
                 onClick={handleRefresh}
                 style={{ 
@@ -204,7 +217,7 @@ export default function CustomerView() {
                 }}
               >
                 <RefreshCw size={18} className={isRefreshing ? "animate-spin" : ""} />
-                Muat Ulang Menu
+                {t.reloadMenu}
               </button>
             </div>
           ) : (
@@ -250,7 +263,7 @@ export default function CustomerView() {
                         fontWeight: '700'
                       }}
                     >
-                      + Tambah
+                      + {t.add}
                     </button>
                   </div>
                 </div>
@@ -273,7 +286,7 @@ export default function CustomerView() {
               onClick={e => e.stopPropagation()}
             >
               <div style={{ padding: '1.5rem', background: 'var(--surface)', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ fontSize: '1.5rem' }}>Your Selection</h2>
+                <h2 style={{ fontSize: '1.5rem' }}>{t.yourSelection}</h2>
                 <button onClick={() => setIsCartOpen(false)} style={{ background: 'var(--bg)', padding: '0.5rem' }}><X size={20} /></button>
               </div>
               
@@ -281,7 +294,7 @@ export default function CustomerView() {
                 {cart.length === 0 ? (
                   <div style={{ textAlign: 'center', marginTop: '4rem' }}>
                      <ShoppingCart size={48} color="var(--border)" style={{ marginBottom: '1rem' }} />
-                     <p style={{ color: 'var(--text-light)' }}>Your cart is empty.</p>
+                     <p style={{ color: 'var(--text-light)' }}>{t.cartEmpty}</p>
                   </div>
                 ) : (
                   cart.map(item => (
@@ -296,7 +309,7 @@ export default function CustomerView() {
                         </div>
                         <div style={{ textAlign: 'right' }}>
                           <p style={{ fontWeight: '800', color: 'var(--secondary)' }}>Rp {(item.price * item.quantity).toLocaleString()}</p>
-                          <button onClick={() => removeFromCart(item.id)} style={{ color: '#e74c3c', fontSize: '0.75rem', fontWeight: '600', background: 'none', padding: 0 }}>Remove</button>
+                          <button onClick={() => removeFromCart(item.id)} style={{ color: '#e74c3c', fontSize: '0.75rem', fontWeight: '600', background: 'none', padding: 0 }}>{t.delete}</button>
                         </div>
                       </div>
                       
@@ -319,14 +332,14 @@ export default function CustomerView() {
               {cart.length > 0 && (
                 <div className="glass" style={{ padding: '1.5rem', borderTop: '1px solid var(--border)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                    <span style={{ fontSize: '1.1rem', fontWeight: '600' }}>Total Amount</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: '600' }}>{t.totalAmount}</span>
                     <span style={{ fontSize: '1.3rem', fontWeight: '800', color: 'var(--secondary)' }}>Rp {total.toLocaleString()}</span>
                   </div>
                   <button 
                     onClick={handleCheckout}
                     style={{ width: '100%', background: 'var(--secondary)', color: 'white', padding: '1.2rem', fontSize: '1.1rem', fontWeight: 'bold' }}
                   >
-                    Proceed to Payment
+                    {t.proceedToPayment}
                   </button>
                 </div>
               )}
@@ -343,61 +356,118 @@ export default function CustomerView() {
             style={{ position: 'fixed', inset: 0, background: 'var(--bg)', zIndex: 2000, display: 'flex', flexDirection: 'column', padding: '1.5rem' }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-              <h2 className="brand gradient-text" style={{ fontSize: '1.8rem' }}>Payment</h2>
+              <h2 className="brand gradient-text" style={{ fontSize: '1.8rem' }}>{t.payment}</h2>
               <button onClick={() => setCheckoutStep('browsing')} style={{ background: 'var(--surface)', padding: '0.5rem', borderRadius: '50%' }}><X size={24} /></button>
             </div>
 
-            <div style={{ flex: 1, overflowY: 'auto', textAlign: 'center' }}>
-              <div className="card" style={{ padding: '2rem', marginBottom: '2.5rem', maxWidth: '320px', margin: '0 auto 2.5rem' }}>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/QRIS_logo.png" alt="QRIS" style={{ width: '120px', marginBottom: '1.5rem' }} />
-                <div style={{ background: 'white', padding: '1rem', border: '1px solid var(--border)', borderRadius: '12px' }}>
-                  {qrisImage ? (
-                     <img src={qrisImage} alt="Store QRIS" style={{ width: '100%', borderRadius: '4px' }} />
-                  ) : (
-                    <div style={{ padding: '3rem 1rem', color: 'var(--text-light)', fontSize: '0.8rem', background: '#fcfcfc' }}>
-                      QRIS QR Code will appear here.
-                    </div>
-                  )}
-                </div>
-                <div style={{ marginTop: '1.5rem', fontWeight: '800', fontSize: '1.4rem', color: 'var(--secondary)' }}>Rp {total.toLocaleString()}</div>
+            <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '2rem' }}>
+              <div style={{ maxWidth: '400px', margin: '0 auto 2rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', fontWeight: '700', color: 'var(--secondary)' }}>{t.customerName}</label>
+                <input 
+                  type="text" 
+                  placeholder={t.customerNamePlaceholder}
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--border)', background: 'white', fontSize: '1rem', outline: 'none', transition: 'border-color 0.3s' }}
+                  onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                  onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+                />
               </div>
 
-              <div style={{ maxWidth: '400px', margin: '0 auto', textAlign: 'left' }}>
-                <h3 style={{ marginBottom: '0.5rem', fontSize: '1.2rem' }}>Transfer Confirmation</h3>
-                <p style={{ color: 'var(--text-light)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>Scan the QRIS above, then upload the receipt.</p>
-                
-                <div 
-                  onClick={() => fileInputRef.current?.click()}
-                  className="card"
-                  style={{ 
-                    width: '100%', 
-                    height: '180px', 
-                    border: '2px dashed var(--primary)', 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    background: 'var(--surface)',
-                    cursor: 'pointer',
-                    overflow: 'hidden'
-                  }}
-                >
-                  {paymentProof ? (
-                    <img src={paymentProof} alt="Proof" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                  ) : (
-                    <>
-                      <Camera size={40} color="var(--primary)" />
-                      <span style={{ marginTop: '0.8rem', color: 'var(--primary)', fontWeight: '700' }}>Select Screenshot</span>
-                    </>
-                  )}
+              <div style={{ maxWidth: '400px', margin: '0 auto 2rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', fontWeight: '700', color: 'var(--secondary)' }}>{t.paymentMethod}</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <button 
+                    onClick={() => setPaymentMethod('qris')}
+                    style={{ 
+                      padding: '1rem', 
+                      borderRadius: '12px', 
+                      border: paymentMethod === 'qris' ? '2px solid var(--primary)' : '2px solid var(--border)',
+                      background: paymentMethod === 'qris' ? 'var(--surface)' : 'white',
+                      fontWeight: '700',
+                      color: paymentMethod === 'qris' ? 'var(--primary-dark)' : 'var(--text-light)'
+                    }}
+                  >
+                    {t.qrisAuto}
+                  </button>
+                  <button 
+                    onClick={() => setPaymentMethod('cash')}
+                    style={{ 
+                      padding: '1rem', 
+                      borderRadius: '12px', 
+                      border: paymentMethod === 'cash' ? '2px solid var(--primary)' : '2px solid var(--border)',
+                      background: paymentMethod === 'cash' ? 'var(--surface)' : 'white',
+                      fontWeight: '700',
+                      color: paymentMethod === 'cash' ? 'var(--primary-dark)' : 'var(--text-light)'
+                    }}
+                  >
+                    {t.cashAtCashier}
+                  </button>
                 </div>
+              </div>
+
+              {paymentMethod === 'qris' ? (
+                <div className="card" style={{ padding: '2rem', marginBottom: '2.5rem', maxWidth: '320px', margin: '0 auto 2.5rem', textAlign: 'center' }}>
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/QRIS_logo.png" alt="QRIS" style={{ width: '120px', marginBottom: '1.5rem' }} />
+                  <div style={{ background: 'white', padding: '1rem', border: '1px solid var(--border)', borderRadius: '12px' }}>
+                    {qrisImage ? (
+                      <img src={qrisImage} alt="Store QRIS" style={{ width: '100%', borderRadius: '4px' }} />
+                    ) : (
+                      <div style={{ padding: '3rem 1rem', color: 'var(--text-light)', fontSize: '0.8rem', background: '#fcfcfc' }}>
+                        QRIS QR Code will appear here.
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ marginTop: '1.5rem', fontWeight: '800', fontSize: '1.4rem', color: 'var(--secondary)' }}>Rp {total.toLocaleString()}</div>
+                </div>
+              ) : (
+                <div className="card" style={{ padding: '2.5rem 1.5rem', marginBottom: '2.5rem', maxWidth: '400px', margin: '0 auto 2.5rem', textAlign: 'center', background: 'var(--surface)', border: '2px dashed var(--primary)' }}>
+                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💵</div>
+                  <h3 style={{ color: 'var(--secondary)', marginBottom: '0.5rem' }}>{language === 'en' ? 'Cash Payment' : 'Pembayaran Tunai'}</h3>
+                  <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', lineHeight: 1.5 }}>{t.cashDesc.replace('{total}', `Rp ${total.toLocaleString()}`)}</p>
+                </div>
+              )}
+
+              <div style={{ maxWidth: '400px', margin: '0 auto', textAlign: 'left' }}>
+                {paymentMethod === 'qris' && (
+                  <>
+                    <h3 style={{ marginBottom: '0.5rem', fontSize: '1.2rem' }}>{t.transferConfirmation}</h3>
+                    <p style={{ color: 'var(--text-light)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>{t.transferDesc}</p>
+                    
+                    <div 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="card"
+                      style={{ 
+                        width: '100%', 
+                        height: '180px', 
+                        border: '2px dashed var(--primary)', 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        background: 'var(--surface)',
+                        cursor: 'pointer',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      {paymentProof ? (
+                        <img src={paymentProof} alt="Proof" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      ) : (
+                        <>
+                          <Camera size={40} color="var(--primary)" />
+                          <span style={{ marginTop: '0.8rem', color: 'var(--primary)', fontWeight: '700' }}>{t.selectScreenshot}</span>
+                        </>
+                      )}
+                    </div>
+                  </>
+                )}
+                
                 <input type="file" ref={fileInputRef} onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
                     const reader = new FileReader();
                     reader.onloadend = async () => {
                       const base64 = reader.result as string;
-                      // Kompresi lebih agresif agar cepat: 600px width, 0.5 quality
                       const compressed = await compressImage(base64, 600, 0.5);
                       setPaymentProof(compressed);
                     };
@@ -406,12 +476,12 @@ export default function CustomerView() {
                 }} accept="image/*" style={{ display: 'none' }} />
                 
                 <button 
-                  disabled={!paymentProof || isSubmittingOrder}
-                  onClick={handleSubmitPayment}
+                  disabled={isSubmittingOrder}
+                  onClick={handleSubmitOrder}
                   style={{ 
                     marginTop: '2rem', 
                     width: '100%', 
-                    background: (paymentProof && !isSubmittingOrder) ? 'var(--accent)' : 'var(--border)', 
+                    background: isSubmittingOrder ? 'var(--border)' : 'var(--accent)', 
                     color: 'white', 
                     padding: '1.2rem', 
                     fontWeight: '800',
@@ -419,15 +489,16 @@ export default function CustomerView() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '0.8rem'
+                    gap: '0.8rem',
+                    borderRadius: '16px'
                   }}
                 >
                   {isSubmittingOrder ? (
                     <>
                       <Loader2 size={20} className="animate-spin" />
-                      Memproses & Mengunggah...
+                      {t.processingUpload}
                     </>
-                  ) : 'Konfirmasi Pesanan'}
+                  ) : t.confirmOrder}
                 </button>
               </div>
             </div>
@@ -443,16 +514,16 @@ export default function CustomerView() {
             style={{ position: 'fixed', inset: 0, background: 'var(--bg)', zIndex: 3000, display: 'flex', flexDirection: 'column', padding: '1.5rem' }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
-              <h2 className="brand gradient-text" style={{ fontSize: '2rem' }}>Order Status</h2>
+              <h2 className="brand gradient-text" style={{ fontSize: '2rem' }}>{t.orderStatus}</h2>
               <button onClick={() => setCheckoutStep('browsing')} style={{ background: 'var(--surface)', padding: '0.5rem', borderRadius: '50%' }}><X size={24} /></button>
             </div>
 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2rem', maxWidth: '500px', margin: '0 auto', width: '100%' }}>
               {[
-                { status: 'pending', label: 'Verifying', desc: 'Checking your payment proof' },
-                { status: 'verified', label: 'Confirmed', desc: 'Order sent to kitchen' },
-                { status: 'processing', label: 'Cooking', desc: 'Chef is preparing your meal' },
-                { status: 'ready', label: 'Ready!', desc: 'Coming to your table' },
+                { status: 'pending', label: t.statusVerifying, desc: t.statusVerifyingDesc },
+                { status: 'verified', label: t.statusConfirmed, desc: t.statusConfirmedDesc },
+                { status: 'processing', label: t.statusCooking, desc: t.statusCookingDesc },
+                { status: 'ready', label: t.statusReady, desc: t.statusReadyDesc },
               ].map((step, idx) => {
                 const isCompleted = ['pending', 'verified', 'processing', 'ready', 'completed'].indexOf(activeOrder.status) > idx;
                 const isCurrent = activeOrder.status === step.status;
@@ -479,7 +550,7 @@ export default function CustomerView() {
             </div>
 
             <button onClick={() => setCheckoutStep('browsing')} style={{ marginTop: '2rem', width: '100%', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '1.1rem', fontWeight: '700' }}>
-              Back to Menu
+              {t.backToMenu}
             </button>
           </motion.div>
         )}

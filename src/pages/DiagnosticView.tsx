@@ -32,7 +32,7 @@ export default function DiagnosticView() {
     const unsubOrders = onSnapshot(query(collection(db, 'orders'), limit(1)), (snap) => {
       setStats(prev => ({
         ...prev,
-        orderCount: snap.size > 0 ? 'Active' : 0
+        orderCount: snap.size
       }));
     });
 
