@@ -9,7 +9,7 @@ import { useState, useRef, useEffect } from 'react';
 import { translations } from '../utils/translations';
 
 export default function OwnerView() {
-  const { orders, menu, addMenuItem, updateMenuItem, deleteMenuItem, qrisImage, setQrisImage, tables, addTable, deleteTable, refreshData, isLoading, language, setLanguage } = useStore();
+  const { orders, menu, addMenuItem, updateMenuItem, deleteMenuItem, qrisImage, setQrisImage, qrisData, setQrisData, tables, addTable, deleteTable, refreshData, isLoading, language, setLanguage } = useStore();
   const t = translations[language];
 
   useEffect(() => {
@@ -385,6 +385,31 @@ export default function OwnerView() {
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: '0.7rem', padding: '6px', textAlign: 'center' }}>
               {t.changeQRIS}
             </div>
+          </div>
+
+          <div style={{ marginTop: '1.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', fontWeight: '700', color: 'var(--secondary)' }}>Raw QRIS Data (Optional)</label>
+            <textarea 
+              placeholder="000201010211..."
+              value={qrisData}
+              onChange={(e) => setQrisData(e.target.value)}
+              style={{ 
+                width: '100%', 
+                padding: '1rem', 
+                borderRadius: '12px', 
+                border: '1px solid var(--border)', 
+                background: 'var(--bg)', 
+                fontSize: '0.8rem',
+                fontFamily: 'monospace',
+                height: '80px',
+                resize: 'none'
+              }}
+            />
+            <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', marginTop: '0.6rem', lineHeight: 1.4 }}>
+              {language === 'en' 
+                ? "Paste the raw text of your QRIS here to enable dynamic amounts. If empty, the static image above will be used."
+                : "Tempel teks mentah QRIS Anda di sini untuk mengaktifkan nominal dinamis. Jika kosong, gambar statis di atas yang akan digunakan."}
+            </p>
           </div>
         </section>
       </div>

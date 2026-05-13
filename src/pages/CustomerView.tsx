@@ -7,10 +7,12 @@ import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { compressImage } from '../utils/compression';
 import { translations } from '../utils/translations';
+import { generateDynamicQRIS } from '../utils/qris';
+import { QRCodeCanvas } from 'qrcode.react';
 
 export default function CustomerView() {
   const { tableId } = useParams();
-  const { menu, addOrder, orders, qrisImage, refreshData, isLoading, language, setLanguage } = useStore();
+  const { menu, addOrder, orders, qrisImage, qrisData, refreshData, isLoading, language, setLanguage } = useStore();
   const t = translations[language];
   const [cart, setCart] = useState<OrderItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -407,10 +409,23 @@ export default function CustomerView() {
               </div>
 
               {paymentMethod === 'qris' ? (
-                <div className="card" style={{ padding: '2rem', marginBottom: '2.5rem', maxWidth: '320px', margin: '0 auto 2.5rem', textAlign: 'center' }}>
+                <div className="card" style={{ padding: '2rem', marginBottom: '1.5rem', maxWidth: '320px', margin: '0 auto 1.5rem', textAlign: 'center' }}>
                   <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/QRIS_logo.png" alt="QRIS" style={{ width: '120px', marginBottom: '1.5rem' }} />
-                  <div style={{ background: 'white', padding: '1rem', border: '1px solid var(--border)', borderRadius: '12px' }}>
-                    {qrisImage ? (
+                  <div style={{ background: 'white', padding: '1rem', border: '1px solid var(--border)', borderRadius: '12px', display: 'flex', justifyContent: 'center' }}>
+                    {qrisData ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
+                        <QRCodeCanvas 
+                          value={generateDynamicQRIS(qrisData, total)}
+                          size={256}
+                          level="H"
+                          includeMargin={true}
+                          style={{ width: '100%', height: 'auto', maxWidth: '256px', margin: '0 auto' }}
+                        />
+                        <div style={{ background: 'var(--surface)', padding: '0.8rem', borderRadius: '8px', fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600', border: '1px solid #ffe8cc' }}>
+                          ✨ {t.qrisAutoDesc}
+                        </div>
+                      </div>
+                    ) : qrisImage ? (
                       <img src={qrisImage} alt="Store QRIS" style={{ width: '100%', borderRadius: '4px' }} />
                     ) : (
                       <div style={{ padding: '3rem 1rem', color: 'var(--text-light)', fontSize: '0.8rem', background: '#fcfcfc' }}>

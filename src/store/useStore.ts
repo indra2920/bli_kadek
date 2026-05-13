@@ -47,6 +47,7 @@ interface AppState {
   orders: Order[];
   tables: string[];
   qrisImage: string;
+  qrisData: string;
   isLoading: boolean;
   addOrder: (order: Omit<Order, 'id'>) => Promise<void>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
@@ -56,6 +57,7 @@ interface AppState {
   addTable: (tableId: string) => Promise<void>;
   deleteTable: (tableId: string) => Promise<void>;
   setQrisImage: (image: string) => Promise<void>;
+  setQrisData: (data: string) => Promise<void>;
   updateOrderProof: (orderId: string, proof: string) => Promise<void>;
   uploadImage: (path: string, base64: string) => Promise<string>;
   seedData: () => Promise<void>;
@@ -71,6 +73,7 @@ export const useStore = create<AppState>((set, get) => {
     orders: [],
     tables: ['1', '2', '3', '4', '5'],
     qrisImage: '',
+    qrisData: '',
     isLoading: true,
     language: 'id',
     setLanguage: (lang: 'id' | 'en') => set({ language: lang }),
@@ -105,7 +108,11 @@ export const useStore = create<AppState>((set, get) => {
             settings[doc.id] = doc.data();
           });
           if (settings.tables) set({ tables: settings.tables.list });
-          if (settings.qris) set({ qrisImage: settings.qris.image });
+          if (settings.tables) set({ tables: settings.tables.list });
+          if (settings.qris) set({ 
+            qrisImage: settings.qris.image,
+            qrisData: settings.qris.data || ''
+          });
         }
       );
     },
@@ -190,7 +197,11 @@ export const useStore = create<AppState>((set, get) => {
     },
 
     setQrisImage: async (image) => {
-      await setDoc(doc(db, 'settings', 'qris'), { image });
+      await setDoc(doc(db, 'settings', 'qris'), { image }, { merge: true });
+    },
+
+    setQrisData: async (data) => {
+      await setDoc(doc(db, 'settings', 'qris'), { data }, { merge: true });
     },
 
     updateOrderProof: async (orderId, proof) => {
