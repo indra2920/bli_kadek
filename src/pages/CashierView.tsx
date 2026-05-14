@@ -187,6 +187,24 @@ export default function CashierView() {
                              <span style={{ fontWeight: 'bold' }}>Note:</span> {item.note}
                           </div>
                         )}
+                        {item.selectedVariants && item.selectedVariants.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.4rem' }}>
+                            {item.selectedVariants.map((v, i) => (
+                              <span key={i} style={{ fontSize: '0.65rem', background: '#e1f5fe', padding: '2px 6px', borderRadius: '6px', color: '#0288d1', fontWeight: '700', border: '1px solid #b3e5fc' }}>
+                                Rasa: {v.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {item.selectedOptions && item.selectedOptions.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.4rem' }}>
+                            {item.selectedOptions.map((opt, i) => (
+                              <span key={i} style={{ fontSize: '0.65rem', background: 'var(--surface)', padding: '2px 6px', borderRadius: '6px', color: 'var(--primary)', fontWeight: '700', border: '1px solid var(--border)' }}>
+                                + {opt.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -276,6 +294,16 @@ export default function CashierView() {
                 {item.note && (
                   <div style={{ marginLeft: '15px', fontSize: '12px' }}>
                     *** NOTE: {item.note} ***
+                  </div>
+                )}
+                {item.selectedVariants && item.selectedVariants.length > 0 && (
+                  <div style={{ marginLeft: '15px', fontSize: '12px', fontWeight: 'bold' }}>
+                    Rasa: {item.selectedVariants.map(v => v.name).join(', ')}
+                  </div>
+                )}
+                {item.selectedOptions && item.selectedOptions.length > 0 && (
+                  <div style={{ marginLeft: '15px', fontSize: '12px', fontWeight: 'bold' }}>
+                    Extras: {item.selectedOptions.map(o => o.name).join(', ')}
                   </div>
                 )}
               </div>

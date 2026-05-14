@@ -25,6 +25,9 @@ export default function CustomerView() {
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'qris'>('qris');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedItemForOptions, setSelectedItemForOptions] = useState<MenuItem | null>(null);
+  const [tempSelectedOptions, setTempSelectedOptions] = useState<any[]>([]);
+  const [tempSelectedVariants, setTempSelectedVariants] = useState<any[]>([]);
 
   useEffect(() => {
     refreshData();
@@ -48,13 +51,50 @@ export default function CustomerView() {
     return menu.filter(item => item.category === currentCat);
   }, [menu, categories, catIndex]);
 
-  const addToCart = (item: MenuItem) => {
+  const addToCart = (item: MenuItem, selectedOptions: any[] = [], selectedVariants: any[] = []) => {
     setCart(prev => {
-      const existing = prev.find(i => i.id === item.id);
-      if (existing) {
-        return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
+      // Find exact same item with same options and variants
+      const existingIndex = prev.findIndex(i => 
+        i.id === item.id && 
+        JSON.stringify(i.selectedOptions || []) === JSON.stringify(selectedOptions) &&
+        JSON.stringify(i.selectedVariants || []) === JSON.stringify(selectedVariants)
+      );
+
+      if (existingIndex > -1) {
+        const newCart = [...prev];
+        newCart[existingIndex].quantity += 1;
+        return newCart;
       }
-      return [...prev, { ...item, quantity: 1, note: '' }];
+      return [...prev, { ...item, quantity: 1, note: '', selectedOptions, selectedVariants }];
+    });
+    setSelectedItemForOptions(null);
+    setTempSelectedOptions([]);
+    setTempSelectedVariants([]);
+  };
+
+  const handleAddItemClick = (item: MenuItem) => {
+    if ((item.options && item.options.length > 0) || (item.variants && item.variants.length > 0)) {
+      setSelectedItemForOptions(item);
+      setTempSelectedOptions([]);
+      setTempSelectedVariants([]);
+    } else {
+      addToCart(item);
+    }
+  };
+
+  const toggleTempOption = (option: any) => {
+    setTempSelectedOptions(prev => {
+      const exists = prev.find(o => o.name === option.name);
+      if (exists) return prev.filter(o => o.name !== option.name);
+      return [...prev, option];
+    });
+  };
+
+  const toggleTempVariant = (variant: any) => {
+    setTempSelectedVariants(prev => {
+      const exists = prev.find(v => v.name === variant.name);
+      if (exists) return prev.filter(v => v.name !== variant.name);
+      return [...prev, variant];
     });
   };
 
@@ -62,11 +102,15 @@ export default function CustomerView() {
     setCart(prev => prev.map(i => i.id === itemId ? { ...i, note } : i));
   };
 
-  const removeFromCart = (itemId: string) => {
-    setCart(prev => prev.filter(i => i.id !== itemId));
+  const removeFromCart = (index: number) => {
+    setCart(prev => prev.filter((_, i) => i !== index));
   };
 
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const total = cart.reduce((sum, item) => {
+    const optionsTotal = (item.selectedOptions || []).reduce((s, o) => s + o.price, 0);
+    const variantsTotal = (item.selectedVariants || []).reduce((s, v) => s + v.price, 0);
+    return sum + ((item.price + optionsTotal + variantsTotal) * item.quantity);
+  }, 0);
 
   const paginate = (newDirection: number) => {
     const nextIndex = catIndex + newDirection;
@@ -252,7 +296,7 @@ export default function CustomerView() {
                     <h3 style={{ fontSize: '0.9rem', marginBottom: '0.3rem', color: 'var(--secondary)', fontWeight: '700' }}>{item.name}</h3>
                     <p style={{ fontSize: '0.65rem', color: 'var(--text-light)', height: '1.8rem', overflow: 'hidden', marginBottom: '1rem', lineHeight: 1.3 }}>{item.description}</p>
                     <button 
-                      onClick={() => addToCart(item)}
+                      onClick={() => handleAddItemClick(item)}
                       style={{ 
                         marginTop: 'auto',
                         width: '100%', 
@@ -299,21 +343,46 @@ export default function CustomerView() {
                      <p style={{ color: 'var(--text-light)' }}>{t.cartEmpty}</p>
                   </div>
                 ) : (
-                  cart.map(item => (
-                    <div key={item.id} className="card" style={{ padding: '1rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                           <img src={item.image} style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover' }} />
-                           <div>
-                              <h4 style={{ fontSize: '0.9rem', fontWeight: '700' }}>{item.name}</h4>
-                              <p style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>x{item.quantity}</p>
-                           </div>
+                  cart.map((item, index) => {
+                    const itemOptionsTotal = (item.selectedOptions || []).reduce((s, o) => s + o.price, 0);
+                    const itemVariantsTotal = (item.selectedVariants || []).reduce((s, v) => s + v.price, 0);
+                    return (
+                      <div key={index} className="card" style={{ padding: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                             <img src={item.image} style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover' }} />
+                             <div>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: '700' }}>{item.name}</h4>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>x{item.quantity}</p>
+                             </div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <p style={{ fontWeight: '800', color: 'var(--secondary)' }}>Rp {((item.price + itemOptionsTotal + itemVariantsTotal) * item.quantity).toLocaleString()}</p>
+                            <button onClick={() => removeFromCart(index)} style={{ color: '#e74c3c', fontSize: '0.75rem', fontWeight: '600', background: 'none', padding: 0 }}>{t.delete}</button>
+                          </div>
                         </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <p style={{ fontWeight: '800', color: 'var(--secondary)' }}>Rp {(item.price * item.quantity).toLocaleString()}</p>
-                          <button onClick={() => removeFromCart(item.id)} style={{ color: '#e74c3c', fontSize: '0.75rem', fontWeight: '600', background: 'none', padding: 0 }}>{t.delete}</button>
-                        </div>
-                      </div>
+                        
+                        {/* Variants List */}
+                        {item.selectedVariants && item.selectedVariants.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.4rem' }}>
+                            {item.selectedVariants.map((v, i) => (
+                              <span key={i} style={{ fontSize: '0.65rem', background: '#f0f9ff', padding: '2px 8px', borderRadius: '10px', color: '#0369a1', fontWeight: '700', border: '1px solid #bae6fd' }}>
+                                Rasa: {v.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Options List */}
+                        {item.selectedOptions && item.selectedOptions.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.8rem' }}>
+                            {item.selectedOptions.map((opt, i) => (
+                              <span key={i} style={{ fontSize: '0.65rem', background: 'var(--surface)', padding: '2px 8px', borderRadius: '10px', color: 'var(--primary)', fontWeight: '700', border: '1px solid var(--border)' }}>
+                                + {opt.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       
                       {/* Special Request Note */}
                       <div style={{ background: 'var(--bg)', padding: '0.6rem', borderRadius: '8px', display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
@@ -327,8 +396,9 @@ export default function CustomerView() {
                         />
                       </div>
                     </div>
-                  ))
-                )}
+                  );
+                })
+              )}
               </div>
 
               {cart.length > 0 && (
@@ -567,6 +637,113 @@ export default function CustomerView() {
             <button onClick={() => setCheckoutStep('browsing')} style={{ marginTop: '2rem', width: '100%', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '1.1rem', fontWeight: '700' }}>
               {t.backToMenu}
             </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Options Selection Modal */}
+      <AnimatePresence>
+        {selectedItemForOptions && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', zIndex: 1500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
+            onClick={() => setSelectedItemForOptions(null)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+              style={{ background: 'white', width: '100%', maxWidth: '400px', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.2)' }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div style={{ position: 'relative', height: '180px' }}>
+                <img src={selectedItemForOptions.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <button onClick={() => setSelectedItemForOptions(null)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'rgba(0,0,0,0.5)', color: 'white', padding: '8px', borderRadius: '50%' }}><X size={18} /></button>
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.8))', padding: '1.5rem', color: 'white' }}>
+                  <h3 style={{ fontSize: '1.3rem', fontWeight: '800' }}>{selectedItemForOptions.name}</h3>
+                  <p style={{ fontSize: '0.8rem', opacity: 0.9 }}>Rp {selectedItemForOptions.price.toLocaleString()}</p>
+                </div>
+              </div>
+
+              <div style={{ padding: '1.5rem', maxHeight: '60vh', overflowY: 'auto' }} className="hide-scrollbar">
+                {/* Variants Section */}
+                {selectedItemForOptions.variants && selectedItemForOptions.variants.length > 0 && (
+                  <div style={{ marginBottom: '2rem' }}>
+                    <h4 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '1.2rem', color: 'var(--secondary)' }}>{t.selectVariants}</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                      {selectedItemForOptions.variants.map((v, i) => {
+                        const isSelected = tempSelectedVariants.some(o => o.name === v.name);
+                        return (
+                          <button 
+                            key={i}
+                            onClick={() => toggleTempVariant(v)}
+                            style={{ 
+                              display: 'flex', 
+                              justifyContent: 'space-between', 
+                              alignItems: 'center', 
+                              padding: '1rem', 
+                              borderRadius: '16px', 
+                              border: isSelected ? '2px solid #0ea5e9' : '1px solid var(--border)',
+                              background: isSelected ? '#f0f9ff' : 'white',
+                              transition: 'all 0.2s'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                              <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid #0ea5e9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {isSelected && <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#0ea5e9' }} />}
+                              </div>
+                              <span style={{ fontWeight: '700', color: isSelected ? '#0369a1' : 'var(--secondary)' }}>{v.name}</span>
+                            </div>
+                            <span style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-light)' }}>+ Rp {v.price.toLocaleString()}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Options Section */}
+                {selectedItemForOptions.options && selectedItemForOptions.options.length > 0 && (
+                  <div>
+                    <h4 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '1.2rem', color: 'var(--secondary)' }}>{t.selectOptions}</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                      {selectedItemForOptions.options.map((opt, i) => {
+                        const isSelected = tempSelectedOptions.some(o => o.name === opt.name);
+                        return (
+                          <button 
+                            key={i}
+                            onClick={() => toggleTempOption(opt)}
+                            style={{ 
+                              display: 'flex', 
+                              justifyContent: 'space-between', 
+                              alignItems: 'center', 
+                              padding: '1rem', 
+                              borderRadius: '16px', 
+                              border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border)',
+                              background: isSelected ? 'var(--surface)' : 'white',
+                              transition: 'all 0.2s'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                              <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {isSelected && <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--primary)' }} />}
+                              </div>
+                              <span style={{ fontWeight: '700', color: isSelected ? 'var(--primary-dark)' : 'var(--secondary)' }}>{opt.name}</span>
+                            </div>
+                            <span style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-light)' }}>+ Rp {opt.price.toLocaleString()}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                <button 
+                  onClick={() => addToCart(selectedItemForOptions, tempSelectedOptions, tempSelectedVariants)}
+                  style={{ width: '100%', background: 'var(--accent)', color: 'white', padding: '1.2rem', borderRadius: '16px', marginTop: '2rem', fontSize: '1.1rem', fontWeight: '800', boxShadow: '0 10px 20px rgba(212, 163, 115, 0.3)' }}
+                >
+                  {t.addToCart} • Rp {(selectedItemForOptions.price + tempSelectedOptions.reduce((s,o) => s + o.price, 0) + tempSelectedVariants.reduce((s,v) => s + v.price, 0)).toLocaleString()}
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

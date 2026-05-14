@@ -9,12 +9,18 @@ import {
   query, 
   orderBy,
   setDoc,
-  getDocs
+  getDocs,
+  increment
 } from 'firebase/firestore';
 import { db, storage } from '../firebase';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 
 export type OrderStatus = 'pending' | 'verified' | 'processing' | 'ready' | 'completed';
+
+export interface MenuOption {
+  name: string;
+  price: number;
+}
 
 export interface MenuItem {
   id: string;
@@ -23,11 +29,15 @@ export interface MenuItem {
   price: number;
   category: string;
   image: string;
+  options?: MenuOption[];
+  variants?: MenuOption[];
 }
 
 export interface OrderItem extends MenuItem {
   quantity: number;
   note?: string;
+  selectedOptions?: MenuOption[];
+  selectedVariants?: MenuOption[];
 }
 
 export interface Order {
@@ -48,6 +58,7 @@ interface AppState {
   tables: string[];
   qrisImage: string;
   qrisData: string;
+  visitCount: number;
   isLoading: boolean;
   addOrder: (order: Omit<Order, 'id'>) => Promise<void>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
@@ -60,6 +71,7 @@ interface AppState {
   setQrisData: (data: string) => Promise<void>;
   updateOrderProof: (orderId: string, proof: string) => Promise<void>;
   uploadImage: (path: string, base64: string) => Promise<string>;
+  incrementVisitCount: () => Promise<void>;
   seedData: () => Promise<void>;
   refreshData: () => Promise<void>;
   language: 'id' | 'en';
@@ -74,6 +86,7 @@ export const useStore = create<AppState>((set, get) => {
     tables: ['1', '2', '3', '4', '5'],
     qrisImage: '',
     qrisData: '',
+    visitCount: 0,
     isLoading: true,
     language: 'id',
     setLanguage: (lang: 'id' | 'en') => set({ language: lang }),
@@ -113,6 +126,7 @@ export const useStore = create<AppState>((set, get) => {
             qrisImage: settings.qris.image,
             qrisData: settings.qris.data || ''
           });
+          if (settings.stats) set({ visitCount: settings.stats.visitCount || 0 });
         }
       );
     },
@@ -216,6 +230,16 @@ export const useStore = create<AppState>((set, get) => {
       const storageRef = ref(storage, path);
       await uploadString(storageRef, base64, 'data_url');
       return await getDownloadURL(storageRef);
+    },
+
+    incrementVisitCount: async () => {
+      try {
+        await setDoc(doc(db, 'settings', 'stats'), { 
+          visitCount: increment(1) 
+        }, { merge: true });
+      } catch (err) {
+        console.error('[Store] Increment Visit Error:', err);
+      }
     },
 
     seedData: async () => {

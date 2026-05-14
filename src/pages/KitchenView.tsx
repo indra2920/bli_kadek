@@ -89,6 +89,24 @@ export default function KitchenView() {
                       </div>
                       <div style={{ fontSize: '1.1rem', fontWeight: '600', paddingTop: '2px' }}>{item.name}</div>
                     </div>
+                    {item.selectedVariants && item.selectedVariants.length > 0 && (
+                      <div style={{ marginLeft: '42px', marginTop: '0.4rem', display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                        {item.selectedVariants.map((v, i) => (
+                          <span key={i} style={{ fontSize: '0.75rem', background: '#f0f9ff', padding: '2px 10px', borderRadius: '12px', color: '#0369a1', fontWeight: '800', border: '1px solid #bae6fd' }}>
+                            Rasa: {v.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {item.selectedOptions && item.selectedOptions.length > 0 && (
+                      <div style={{ marginLeft: '42px', marginTop: '0.4rem', display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                        {item.selectedOptions.map((opt, i) => (
+                          <span key={i} style={{ fontSize: '0.75rem', background: 'var(--surface)', padding: '2px 10px', borderRadius: '12px', color: 'var(--secondary)', fontWeight: '800', border: '1px solid var(--border)' }}>
+                            + {opt.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                     {item.note && (
                       <div style={{ marginLeft: '42px', marginTop: '0.4rem', padding: '0.5rem', background: '#fff9e6', borderLeft: '3px solid #f39c12', borderRadius: '4px', fontSize: '0.85rem', color: '#7e5109' }}>
                         <span style={{ fontWeight: '800' }}>{t.note}:</span> {item.note}

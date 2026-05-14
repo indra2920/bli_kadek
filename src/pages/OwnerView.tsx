@@ -25,7 +25,9 @@ export default function OwnerView() {
     price: 0,
     category: 'Main Course',
     description: '',
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400'
+    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400',
+    options: [],
+    variants: []
   });
 
   const completedOrders = orders.filter(o => o.status === 'completed');
@@ -46,7 +48,9 @@ export default function OwnerView() {
         price: 0,
         category: 'Main Course',
         description: '',
-        image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400'
+        image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400',
+        options: [],
+        variants: []
       });
     }
     setIsModalOpen(true);
@@ -103,7 +107,9 @@ export default function OwnerView() {
       price: Number(formData.price),
       category: formData.category,
       description: formData.description,
-      image: formData.image
+      image: formData.image,
+      options: formData.options || [],
+      variants: formData.variants || []
     };
 
     const isEdit = !!editingItem;
@@ -504,6 +510,108 @@ export default function OwnerView() {
                   <img src={formData.image} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" style={{ display: 'none' }} />
+              </div>
+
+              {/* Options/Toppings Management */}
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-light)', textTransform: 'uppercase' }}>{t.options}</label>
+                  <button 
+                    type="button"
+                    onClick={() => setFormData({ ...formData, options: [...(formData.options || []), { name: '', price: 0 }] })}
+                    style={{ padding: '0.4rem 0.8rem', background: 'var(--bg)', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px', border: '1px solid var(--border)' }}
+                  >
+                    + {t.add}
+                  </button>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                  {formData.options?.map((opt, idx) => (
+                    <div key={idx} style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+                      <input 
+                        placeholder="Topping Name"
+                        value={opt.name}
+                        onChange={e => {
+                          const newOpts = [...(formData.options || [])];
+                          newOpts[idx].name = e.target.value;
+                          setFormData({ ...formData, options: newOpts });
+                        }}
+                        style={{ flex: 2, padding: '0.7rem', border: '1px solid var(--border)', borderRadius: '10px', fontSize: '0.85rem' }}
+                      />
+                      <input 
+                        type="number"
+                        placeholder="Price"
+                        value={opt.price}
+                        onChange={e => {
+                          const newOpts = [...(formData.options || [])];
+                          newOpts[idx].price = parseInt(e.target.value) || 0;
+                          setFormData({ ...formData, options: newOpts });
+                        }}
+                        style={{ flex: 1, padding: '0.7rem', border: '1px solid var(--border)', borderRadius: '10px', fontSize: '0.85rem' }}
+                      />
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          const newOpts = (formData.options || []).filter((_, i) => i !== idx);
+                          setFormData({ ...formData, options: newOpts });
+                        }}
+                        style={{ padding: '0.6rem', background: '#fff5f5', borderRadius: '8px' }}
+                      >
+                        <Trash2 size={14} color="#e74c3c" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Variants/Flavors Management */}
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.2rem', marginBottom: '1.2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-light)', textTransform: 'uppercase' }}>{t.variants}</label>
+                  <button 
+                    type="button"
+                    onClick={() => setFormData({ ...formData, variants: [...(formData.variants || []), { name: '', price: 0 }] })}
+                    style={{ padding: '0.4rem 0.8rem', background: 'var(--bg)', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px', border: '1px solid var(--border)' }}
+                  >
+                    + {t.add}
+                  </button>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                  {formData.variants?.map((v, idx) => (
+                    <div key={idx} style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+                      <input 
+                        placeholder="Flavor Name (e.g. Cokelat)"
+                        value={v.name}
+                        onChange={e => {
+                          const newVariants = [...(formData.variants || [])];
+                          newVariants[idx].name = e.target.value;
+                          setFormData({ ...formData, variants: newVariants });
+                        }}
+                        style={{ flex: 2, padding: '0.7rem', border: '1px solid var(--border)', borderRadius: '10px', fontSize: '0.85rem' }}
+                      />
+                      <input 
+                        type="number"
+                        placeholder="Price"
+                        value={v.price}
+                        onChange={e => {
+                          const newVariants = [...(formData.variants || [])];
+                          newVariants[idx].price = parseInt(e.target.value) || 0;
+                          setFormData({ ...formData, variants: newVariants });
+                        }}
+                        style={{ flex: 1, padding: '0.7rem', border: '1px solid var(--border)', borderRadius: '10px', fontSize: '0.85rem' }}
+                      />
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          const newVariants = (formData.variants || []).filter((_, i) => i !== idx);
+                          setFormData({ ...formData, variants: newVariants });
+                        }}
+                        style={{ padding: '0.6rem', background: '#fff5f5', borderRadius: '8px' }}
+                      >
+                        <Trash2 size={14} color="#e74c3c" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
               <button 
                 type="submit" 

@@ -2,9 +2,17 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Link } from 'react-router-dom';
 import { LayoutGrid, Utensils, ChefHat, TrendingUp, ChevronRight, MapPin, Coffee } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { useEffect } from 'react';
+
 
 export default function LandingPage() {
   const tables = useStore((state) => state.tables);
+  const incrementVisitCount = useStore((state) => state.incrementVisitCount);
+
+  useEffect(() => {
+    incrementVisitCount();
+  }, [incrementVisitCount]);
+
   
   return (
     <div className="animate-fade-in" style={{ paddingBottom: '5rem' }}>

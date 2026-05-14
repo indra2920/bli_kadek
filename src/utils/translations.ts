@@ -15,6 +15,12 @@ export const translations = {
     edit: "Edit",
     add: "Tambah",
     note: "Catatan",
+    options: "Pilihan Tambahan",
+    selectOptions: "Pilih Topping",
+    variants: "Pilihan Rasa / Varian",
+    selectVariants: "Pilih Rasa",
+    addToCart: "Tambah ke Keranjang",
+    extra: "Tambahan",
 
     // Customer View
     yourSelection: "Pilihan Anda",
@@ -113,6 +119,12 @@ export const translations = {
     edit: "Edit",
     add: "Add",
     note: "Note",
+    options: "Extra Toppings",
+    selectOptions: "Select Toppings",
+    variants: "Flavors / Variants",
+    selectVariants: "Select Flavor",
+    addToCart: "Add to Cart",
+    extra: "Extra",
 
     // Customer View
     yourSelection: "Your Selection",
